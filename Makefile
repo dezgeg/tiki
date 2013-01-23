@@ -1,9 +1,9 @@
 .PHONY: all clean
 
-all: aine.pdf
+all: essee.pdf
 
-aine.pdf: aine.tex content-aine.tex
-	latexmk aine.tex
+essee.pdf: essee.tex content-essee.tex
+	latexmk essee.tex
 
 clean:
 	-rm -rf *.aux *.bbl *.blg *.log *.out *.pdf *.toc *.dvi *.fdb_latexmk
