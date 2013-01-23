@@ -1,0 +1,22 @@
+http://research.microsoft.com/en-us/um/people/pg/public_psfiles/cacm2012.pdf
+http://research.microsoft.com/en-us/projects/atg/ndss2008.pdf (MS SAGE)
+
+http://marcoramilli.blogspot.fi/2012/04/design-methodology-for-computer.html ?? (joku kirja)
+
+http://static.usenix.org/events/woot08/tech/full_papers/drewry/drewry.pdf (taviso regexit)
+
+http://pages.cs.wisc.edu/~bart/fuzz/ (klassiset fuzz-paperit)
+
+http://www.cloudsw.org/current-issue/201112226146 (Security Testing of Web Browsers, oulun paperi)
+    - kivaa yleislätinää
+
+Finding Software Vulnerabilities by Smart Fuzzing [melkki:SmartFuzz.pdf]
+    - yleislätinää & käsitteitä, viitteitä
+    - (esim. seuraavat kirjat)
+
+
+Kirjoja:
+
+Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]
+Fuzzing: Brute Force Vulnerability Discovery [melkki:BruteForce.pdf]
+

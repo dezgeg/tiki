@@ -1,0 +1,13 @@
+Siellä tulisi siis vastaan peruskäsitteistöä kuten whitebox/blackbox
+testing, polkukattavuus (path coverage), jne. Lähteeksi voit käyttää
+vaikka ihan Sommervillen ohjelmistotuotannon oppikirjaa, olet varmaan
+projektissa tai kurssilla siihen törmännyt. Tai näiden papereiden
+lähdeviitteitä. (Kirjaan viitatessa viittaa muuten luvun, tai esim.
+määritelmiä lainatessa sivun, tarkkuudella. Latexissa \cite[ch.
+3]{sommerville} antaa tehdä samaan kirjaviitteeseen yksittäisen
+tarkemman viittauksen.)
+
+Tällainen tiivistelmä antaa paremmin sen "askel taaksepäin"
+-yleisnäkymän siitä miten vulnerability testing (näille pitää sitten
+löytää tai keksiä suomenkieliset termit) sijoittuu isommalle kartalle,
+ja minkälaista teoriaa sieltä taustalta löytyy.
