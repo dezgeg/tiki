@@ -1,10 +1,24 @@
 \section{Haavoittuvaisuustestaus}
 
-Ohjelmistojen haavoittuvuuksilla voi olla ikäviä seurauksia.
+\subsection{Johdanto}
+Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä.
+Tietoturva-aukoista aiheutunut ylimääräinen työ voi jo itsessään maksaa miljoonia dollareita~\cite{SageArtikkeli},
+puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
 Siksi on toivottavaa, että mahdolliset tietoturva-aukot löydetään mielellään jo ennen tuotantoon asentamista.
-Haavoittuvuuksia voi löytää muun muassa manuaalisesti auditoimalla ohjelmakoodi.
-Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoituja testausmenetelmiä suositaan enemmän.
-Perinteisten ohjelmistotekniikan testausmenetelmien lisäksi tietoturvatestaukseen on kehitelty uudenlaisia testausmenetelmiä.
+
+Tietoturvaongelmia voi toki ohjelmoija löytää tutkimalla lähdekoodia,
+tai koodin puuttuessa disassembloimalla ohjelman binääriä.
+Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
+
+\section{Automaattiset menetelmät}
+
+Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Somerville}.
+Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin erotuksin:
+sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
+testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
+Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
+Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus.
 
 Testauskeinoja luokitellaan karkeasti \emph{white box}- ja \emph{black box}-testeiksi.
 Black box-testauksessa ohjelmistoa testataan antamalla sille syötteitä tavanomaiseen tapaan ilman että sen sisäistä toimintaa tarkastellaan.
