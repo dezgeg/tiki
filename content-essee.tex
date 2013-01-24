@@ -18,7 +18,7 @@ sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
 Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
-sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{JokuLähdeTähän}.
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{JokuLahdeTahan}.
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{black box}- ja \emph{white box}-testeiksi sen mukaan kuinka paljon
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai ohjelmiston sisäisen rakenteen toimintaan~\cite{Somerville}.
@@ -34,7 +34,23 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
 
 \subsection{Staattinen analyysi}
 
-Staattisen analyysin ohjelmistot, kuten esimerkiksi Coverity~\cite{Coverity} yrittävät löytää ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
+Staattiseen analyysiin perustuvat keinot,
+kuten esimerkiksi Coverity-ohjelmisto~\cite{Coverity} tai monien kääntäjien varoitukset yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.
 
+\subsection{Fuzzing}
 
+\emph{Fuzzing} on brute force-keino automaattiseen tietoturvatestaukseen.
+Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa, että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
+Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
+esimerkiksi web-selaimet joutuvat käsittelemään muun muassa HTML, CSS, PNG- ja JavaScript-muotoisia tiedostoja, tarjoten laajasti hyökkäyspinta-alaa~\cite{OuluBrowser}.
+
+\subsubsection{Syötteiden generointi}
+
+Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista black box-menetelmistä monimutkaisempiin keinoihin:
+\begin{itemize}
+    \item Yksinkertaisimmillaan syöte voi olla pelkkä jono satunnaisgeneroituja tavuja~\cite{UnixReliability}.
+    \item Ennalta olemassa olevia valideja syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
+    \item Rakenteellisesti (enimmäkseen) valideja, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda jonkun kieliopin perusteella.
+    \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
+\end{itemize}
