@@ -18,14 +18,19 @@ sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
 Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
-sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus.
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{JokuLähdeTähän}.
 
-Testauskeinoja luokitellaan karkeasti \emph{white box}- ja \emph{black box}-testeiksi.
-Black box-testauksessa ohjelmistoa testataan antamalla sille syötteitä tavanomaiseen tapaan ilman että sen sisäistä toimintaa tarkastellaan.
-Tyypillisesti tämänkaltaisessa testauksessa havainnoidaan ohjelmasta ainoastaan selkeätä ei-toivottua käytöstä, kuten kaatumista tai jumiutumista.
+Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{black box}- ja \emph{white box}-testeiksi sen mukaan kuinka paljon
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai ohjelmiston sisäisen rakenteen toimintaan~\cite{Somerville}.
 
-White box-testauksessa sen sijaan ohjelmiston sisäistä rakennetta voidaan automatisoiduin keinoin
-tarkastella tai muuttaa, tarpeen tullen binääritasolla tai lähdekooditasolla.
+Black box-testauksessa ohjelmabinääriä ajetaan aivan normaalisti, ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
+Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
+tai komentoriviohjelmalle annetaan erinäisiä tiedostoparametrejä.
+
+White box-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
+Tähän tapoja on lukuisia.
+Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
+tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
 
 \subsection{Staattinen analyysi}
 
