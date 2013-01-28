@@ -1,0 +1,21 @@
+- disassemblointi terminä -
+- parempia viitteitä joihinkin termeihin
+- \bibliographystyle{alpha}
+- englanti
+- esittele bb/wb-kategoriat
+- "tiedostoparametrit komentorivillä"
+- selitä whitebox paremmin
+- "symbolinen analyysi" jne.
+- coveritylle lähde (?)
+
+- 1 Johdanto
+- pilkutus
+- kirjaviitteet: sivunro/jne.
+- yhteenveto
+- termien suomennoksia
+
+tikipohja:
+- Helsingin _y_liopisto
+- numero pois lähdeviitteet-otsikosta
+
+Tapaamisaika: perjantai 13:00

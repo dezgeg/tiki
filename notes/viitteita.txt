@@ -13,6 +13,8 @@ http://www.cloudsw.org/current-issue/201112226146 (Security Testing of Web Brows
 http://delivery.acm.org.libproxy.helsinki.fi/10.1145/1380000/1375607/p206-godefroid.pdf?ip=128.214.2.137&acc=ACTIVE%20SERVICE&CFID=257047645&CFTOKEN=35867422&__acm__=1359369436_cc734e403495392eb8f19cbc9471e9e3
     (Grammar-based whitebox fuzzing, lue!)
 
+http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.39.3722 (Testing Java Virtual Machines. An Experience Report on Automatically Testing Java Virtual Machines, lava-fuzzeri)
+
 Finding Software Vulnerabilities by Smart Fuzzing [melkki:SmartFuzz.pdf]
     - yleislätinää & käsitteitä, viitteitä
     - (esim. seuraavat kirjat)
