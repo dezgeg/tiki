@@ -12,7 +12,7 @@ Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoitu ratkaisu o
 
 \section{Automaattiset menetelmät}
 
-Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Somerville}.
+Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
 Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin erotuksin:
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
@@ -21,7 +21,7 @@ Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
 sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{JokuLahdeTahan}.
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{black box}- ja \emph{white box}-testeiksi sen mukaan kuinka paljon
-testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai ohjelmiston sisäisen rakenteen toimintaan~\cite{Somerville}.
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
 
 Black box-testauksessa ohjelmabinääriä ajetaan aivan normaalisti, ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
@@ -35,7 +35,7 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
 \subsection{Staattinen analyysi}
 
 Staattiseen analyysiin perustuvat keinot,
-kuten esimerkiksi Coverity-ohjelmisto~\cite{Coverity} tai monien kääntäjien varoitukset yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
+kuten esimerkiksi Coverity-ohjelmisto~\footnote{\url{http://coverity.com}} tai monien kääntäjien varoitukset yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.
 
 \subsection{Fuzzing}
@@ -55,12 +55,5 @@ Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina
     \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
 
-% -- Ei viel bibtexiä.
 \bibliographystyle{babplain}
-\begin{thebibliography}{9}
-        \bibitem{OuluBrowser}Security Testing of Web Browsers. \url{http://www.cloudsw.org/current-issue/201112226146}
-        \bibitem{SageArtikkeli}SAGE: Whitebox Fuzzing for Security Testing. \url{http://research.microsoft.com/en-us/um/people/pg/public\_psfiles/cacm2012.pdf}
-        \bibitem{UnixReliability}An Empirical Study of the Reliability of UNIX Utilities. \url{ftp://ftp.cs.wisc.edu/paradyn/technical\_papers/fuzz.pdf}
-        \bibitem{Somerville} Ian Somerville: Software Engineering
-        \bibitem{Coverity} \url{http://coverity.com}
-\end{thebibliography}
+\bibliography{essee}
