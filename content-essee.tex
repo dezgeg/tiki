@@ -30,13 +30,18 @@ tai perinteiselle komentoriviohjelmalle komentoriviparametrien kautta.
 White box-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tämänkaltaiseen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
-tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.\fixme{selvennä, johdattele seur. kappaleisiin}
+tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
+
+Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä} ja \emph{fuzzausta}.
 
 \subsection{Staattinen analyysi}
 
-Staattiseen analyysiin perustuvat keinot,
-kuten esimerkiksi Coverity-ohjelmisto~\footnote{\url{http://coverity.com}} tai monien kääntäjien varoitukset yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
-Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta. \fixme[lähde?]
+Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia valkoisen laatikon menetelmiä.
+Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
+Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{Coverity}
+Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
+Usein käytettyjä työkaluja ohjelmointivirheiden etsintään ovat nk. \emph{lint}-ohjelmistot
+eri ohjelmointikielille sekä esimerkiksi kaupallinen Coverity~\cite{Coverity}.
 
 \subsection{Fuzzaus}
 
@@ -44,7 +49,8 @@ Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta. 
 Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}. \fixme[selvennä miksi tämä on toivottavaa]
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
-esimerkiksi web-selaimet joutuvat käsittelemään muun muassa HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}. Tällainen määrä koodia sisältää suuren määrän hyökkäyspinta-alaa.
+esimerkiksi web-selaimet joutuvat käsittelemään muun muassa HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
+Tällainen määrä koodia sisältää suuren määrän hyökkäyspinta-alaa.
 
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista black box-menetelmistä monimutkaisempiin keinoihin:
 \begin{itemize}

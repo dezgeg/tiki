@@ -19,6 +19,10 @@ Finding Software Vulnerabilities by Smart Fuzzing [melkki:SmartFuzz.pdf]
     - yleislätinää & käsitteitä, viitteitä
     - (esim. seuraavat kirjat)
 
+A few billion lines of code later: using static analysis to find bugs in the real world
+http://dl.acm.org/citation.cfm?id=1646353.1646374&coll=DL&dl=ACM&CFID=256912659&CFTOKEN=90790060
+    - coverity
+    - ei mainita tietoturvavaikutuksia
 
 Kirjoja:
 
