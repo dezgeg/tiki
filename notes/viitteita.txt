@@ -24,6 +24,20 @@ http://dl.acm.org/citation.cfm?id=1646353.1646374&coll=DL&dl=ACM&CFID=256912659&
     - coverity
     - ei mainita tietoturvavaikutuksia
 
+Fast Black-Box Testing of System Recovery Code
+http://dl.acm.org.libproxy.helsinki.fi/citation.cfm?id=2168836.2168865&coll=DL&dl=ACM&CFID=257047645&CFTOKEN=35867422
+    - ei nyt suoranaisesti liity
+
+One Technique is Not Enough: A Comparison of Vulnerability Discovery Techniques
+http://ieeexplore.ieee.org.libproxy.helsinki.fi/stamp/stamp.jsp?tp=&arnumber=6092558
+    - enemmän manuaalista hyökkäystä, mutta jännä
+    - vähän staattista analyysiä
+    - hyviä lähteitä
+
+Static Code Analysis to Detect Software Security Vulnerabilities - Does Experience Matter?
+http://ieeexplore.ieee.org.libproxy.helsinki.fi/stamp/stamp.jsp?tp=&arnumber=5066568
+    - tapaustarkastelu
+
 Kirjoja:
 
 Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]

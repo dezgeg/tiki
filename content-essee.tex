@@ -17,7 +17,7 @@ sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
 Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
-sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{JokuLahdeTahan}. \fixme
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{StaticCodeAnalysis}. \fixme[selitä rce?]
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{black box}- ja \emph{white box}-testeiksi \fixme[isolla vai pienellä?] sen mukaan missä määrin
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai\fixme ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
@@ -38,7 +38,7 @@ Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staa
 
 Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia valkoisen laatikon menetelmiä.
 Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
-Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{Coverity}
+Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{StaticCodeAnalysis}
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
 Usein käytettyjä työkaluja ohjelmointivirheiden etsintään ovat nk. \emph{lint}-ohjelmistot
 eri ohjelmointikielille sekä esimerkiksi kaupallinen Coverity~\cite{Coverity}.
