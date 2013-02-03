@@ -1,13 +1,20 @@
 \section{Johdanto}
 
 Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä.
-Tietoturva-aukoista aiheutunut ylimääräinen työ voi jo itsessään maksaa miljoonia dollareita~\cite{SageArtikkeli}, \fixme[joku rahasumma jostain viruksesta]
+Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille 
+sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
-Siksi on toivottavaa, että mahdolliset tietoturva-aukot löydetään ennen ohjelmiston käyttöönottoa.
+Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
+aiheutui yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
+Selvästi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
 
-Tietoturvaongelmia voi toki ohjelmoija löytää tutkimalla lähdekoodia,
-tai koodin puuttuessa disassembloimalla ohjelman binääriä. \fixme
-Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
+Tietoturvaongelmia voi yrittää löytää manuaalisesti tutkimalla ohjelman lähdekoodia,
+mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
+tai avoimen lähdekoodin ohjelmille.
+Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää nk.
+\emph{disassembler}-ohjelmalla symboliselle konekielelle,
+ja tutkia sitä konekielitasolla.
+Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.\fixme
 
 \section{Automaattiset menetelmät}
 
@@ -40,17 +47,26 @@ Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia
 Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{StaticCodeAnalysis}
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
-Usein käytettyjä työkaluja ohjelmointivirheiden etsintään ovat nk. \emph{lint}-ohjelmistot
-eri ohjelmointikielille sekä esimerkiksi kaupallinen Coverity~\cite{Coverity}.
+Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
+ovat nk. \emph{lint}~\cite{Lint}-ohjelmistot eri ohjelmointikielille sekä
+esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
 
 \subsection{Fuzzaus}
 
 \emph{Fuzzaus} on brute force -keino automaattiseen tietoturvatestaukseen.
 Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
-että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}. \fixme[selvennä miksi tämä on toivottavaa]
+että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
+Esimerkiksi erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
+voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
+Aritmetiikka suurilla luvuilla voi aiheuttaa ylivuotoja laskennassa,
+ja taulukoiden varomaton indeksointi voi mennä yli tai ali taulukolle varatun muistialueen.
+
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
-esimerkiksi web-selaimet joutuvat käsittelemään muun muassa HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
-Tällainen määrä koodia sisältää suuren määrän hyökkäyspinta-alaa.
+esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
+HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
+Tämä on varsin suuri määrä koodia,
+joka ottaa syötteekseen tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
+jolloin hyökkäyspinta-alaakin on runsaasti.
 
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista black box-menetelmistä monimutkaisempiin keinoihin:
 \begin{itemize}

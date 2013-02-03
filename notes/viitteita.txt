@@ -38,6 +38,33 @@ Static Code Analysis to Detect Software Security Vulnerabilities - Does Experien
 http://ieeexplore.ieee.org.libproxy.helsinki.fi/stamp/stamp.jsp?tp=&arnumber=5066568
     - tapaustarkastelu
 
+Fuzzing with code fragments
+http://dl.acm.org.libproxy.helsinki.fi/citation.cfm?id=2362793.2362831&coll=DL&dl=ACM&CFID=257047645&CFTOKEN=35867422
+    - js-fuzzausta selaimissa, $50k bug bountyja
+
+An Empirical Study of Zero-Day Attacks In The Real World
+http://dl.acm.org.libproxy.helsinki.fi/citation.cfm?id=2382196.2382284&coll=DL&dl=ACM&CFID=257047645&CFTOKEN=35867422
+    - zero day-exploiteille kerrottu $250k hinta
+    - bug bountyista
+
+Monitoring and early warning for internet worms
+    - Code Red:in kustannukset
+
+Code-Red: a case study on the spread and victims of an internet worm
+http://dl.acm.org.libproxy.helsinki.fi/citation.cfm?id=637244&dl=ACM&coll=DL
+    - arvaa
+
+
+Mitigating program security vulnerabilities: Approaches and challenges
+http://dl.acm.org.libproxy.helsinki.fi/citation.cfm?id=2187673&dl=ACM&coll=DL
+    - kaikenlaista lätinää
+    - mahdollisesti hyviä yksityiskohtaisia viitteitä
+
+Violating Assumptions with Fuzzing
+http://www.ida.liu.se/~TDDC90/literature/papers/violating05.pdf
+    - trust boundary
+
+
 Kirjoja:
 
 Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]
