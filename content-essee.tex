@@ -1,7 +1,7 @@
 \section{Johdanto}
 
 Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä.
-Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille 
+Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
 sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
 Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
@@ -11,10 +11,10 @@ Selvästi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua enne
 Tietoturvaongelmia voi yrittää löytää manuaalisesti tutkimalla ohjelman lähdekoodia,
 mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
 tai avoimen lähdekoodin ohjelmille.
-Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää nk.
-\emph{disassembler}-ohjelmalla symboliselle konekielelle,
-ja tutkia sitä konekielitasolla.
-Tämä kuitenkin on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.\fixme
+Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
+disassembler-ohjelmalla symboliselle konekielelle
+ja tutkia ohjelmaa konekielitasolla.
+Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
 
 \section{Automaattiset menetelmät}
 
@@ -24,17 +24,17 @@ sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
 Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
-sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{StaticCodeAnalysis}. \fixme[selitä rce?]
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{StaticCodeAnalysis}.
 
-Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{black box}- ja \emph{white box}-testeiksi \fixme[isolla vai pienellä?] sen mukaan missä määrin
-testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin vai\fixme ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
+Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
 
-Black box-testauksessa \fixme[käännökset?] ohjelmabinääriä ajetaan aivan normaalisti,
+Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
 ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
 tai perinteiselle komentoriviohjelmalle komentoriviparametrien kautta.
 
-White box-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
+Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tämänkaltaiseen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
 tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
@@ -43,12 +43,12 @@ Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staa
 
 \subsection{Staattinen analyysi}
 
-Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia valkoisen laatikon menetelmiä.
+Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia whitebox-menetelmiä.
 Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{StaticCodeAnalysis}
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
 Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
-ovat nk. \emph{lint}~\cite{Lint}-ohjelmistot eri ohjelmointikielille sekä
+ovat \emph{lint}~\cite{Lint}-tyyliset ohjelmistot eri ohjelmointikielille sekä
 esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
 
 \subsection{Fuzzaus}
@@ -68,11 +68,13 @@ Tämä on varsin suuri määrä koodia,
 joka ottaa syötteekseen tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
 jolloin hyökkäyspinta-alaakin on runsaasti.
 
-Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista black box-menetelmistä monimutkaisempiin keinoihin:
+Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
 \begin{itemize}
-    \item Yksinkertaisimmillaan syöte voi olla pelkkä jono satunnaisgeneroituja tavuja~\cite{UnixReliability}. \fixme[esimerkki]
-    \item Ennalta olemassa olevia valideja syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
-    \item Rakenteellisesti (enimmäkseen) valideja, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstivapaan kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
+    \item Yksinkertaisimmillaan syöte voi olla lähes pelkkää satunnaista dataa.
+          Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä ilman sen kummempaa rakennetta,
+          jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja tavuja~\cite{UnixReliability}.
+    \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
+    \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstivapaan kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
     \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
 
