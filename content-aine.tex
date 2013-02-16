@@ -1,0 +1,82 @@
+\section{Johdanto}
+
+Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä.
+Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
+sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
+puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
+Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
+aiheutui yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
+Selvästi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
+
+Tietoturvaongelmia voi yrittää löytää manuaalisesti tutkimalla ohjelman lähdekoodia,
+mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
+tai avoimen lähdekoodin ohjelmille.
+Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
+disassembler-ohjelmalla symboliselle konekielelle
+ja tutkia ohjelmaa konekielitasolla.
+Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
+
+\section{Automaattiset menetelmät}
+
+Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
+Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
+sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
+testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
+Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
+Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
+sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{StaticCodeAnalysis}.
+
+Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
+
+Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
+ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
+Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
+tai perinteiselle komentoriviohjelmalle komentoriviparametrien kautta.
+
+Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
+Tämänkaltaiseen testaukseen on tapoja huomattavasti enemmän.
+Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
+tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
+
+Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä} ja \emph{fuzzausta}.
+
+\subsection{Staattinen analyysi}
+
+Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia whitebox-menetelmiä.
+Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
+Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta.~\cite{StaticCodeAnalysis}
+Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
+Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
+ovat \emph{lint}~\cite{Lint}-tyyliset ohjelmistot eri ohjelmointikielille sekä
+esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
+
+\subsection{Fuzzaus}
+
+\emph{Fuzzaus} on brute force -keino automaattiseen tietoturvatestaukseen.
+Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
+että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
+Esimerkiksi erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
+voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
+Aritmetiikka suurilla luvuilla voi aiheuttaa ylivuotoja laskennassa,
+ja taulukoiden varomaton indeksointi voi mennä yli tai ali taulukolle varatun muistialueen.
+
+Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
+esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
+HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
+Tämä on varsin suuri määrä koodia,
+joka ottaa syötteekseen tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
+jolloin hyökkäyspinta-alaakin on runsaasti.
+
+Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
+\begin{itemize}
+    \item Yksinkertaisimmillaan syöte voi olla lähes pelkkää satunnaista dataa.
+          Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä ilman sen kummempaa rakennetta,
+          jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja tavuja~\cite{UnixReliability}.
+    \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
+    \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstivapaan kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
+    \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
+\end{itemize}
+
+\bibliographystyle{babalpha}
+\bibliography{essee}
