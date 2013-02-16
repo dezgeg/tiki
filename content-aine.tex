@@ -16,7 +16,12 @@ disassembler-ohjelmalla symboliselle konekielelle
 ja tutkia ohjelmaa konekielitasolla.
 Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
 
-\section{Automaattiset menetelmät}
+\section{Yleisiä tietoturvaongelmia}
+
+\section{Testausmenetelmät}
+
+\subsection{Luokittelu}
+\subsection{Testauksen kriteereitä}
 
 Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
 Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
@@ -41,7 +46,7 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
 
 Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä} ja \emph{fuzzausta}.
 
-\subsection{Staattinen analyysi}
+\section{Staattinen analyysi}
 
 Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia whitebox-menetelmiä.
 Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
@@ -51,7 +56,7 @@ Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintä
 ovat \emph{lint}~\cite{Lint}-tyyliset ohjelmistot eri ohjelmointikielille sekä
 esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
 
-\subsection{Fuzzaus}
+\section{Fuzzaus}
 
 \emph{Fuzzaus} on brute force -keino automaattiseen tietoturvatestaukseen.
 Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
@@ -77,6 +82,10 @@ Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina
     \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstivapaan kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
     \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
+
+\subsection{Testitapausten generointi}
+
+\section{Yhteenveto}
 
 \bibliographystyle{babalpha}
 \bibliography{essee}
