@@ -18,6 +18,38 @@ Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, 
 
 \section{Yleisiä tietoturvaongelmia}
 
+Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
+Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}, JOTAIN.
+Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
+joita tehokkuussyistä edelleen käytetään laajasti.
+
+Muistivirheet ilmenevät useimmiten prosessin tappamisena tietyllä käyttöjärjestelmäkohtaisella virhekoodilla.
+Unix-pohjaisissa järjestelmissä tämä virhe on tunnettu `Segmentation fault'.
+% ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
+Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
+mahdollistaa muistivirheen olemassaolo palvelunestohyökkäyksen eli DoS, denial-of-service-hyökkäyksen.
+Lisäseurauksena prosessin pakotetusta kuolemasta on se,
+ettei prosessilla ole mahdollisuutta siivota jotakin säilyvää tilaa,
+esimerkiksi väliaikaistiedostoja.
+Hallitsematon kuolema voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
+Kriittisimmät muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
+
+Muistivirheiksi luokitellaan tyypillisesti seuraavat:
+
+\begin{itemize}
+    \item Taulukon yli- ja alivuodot: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
+          ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
+          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu.
+          Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
+            ajonaikaympäristön tietorakenteisiin.
+          Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
+            sijaitsevan funktion paluuosoitteen ylikirjoittaminen,
+          josta ei ole pitkä matka mielivaltaisen koodin suoritukseen.
+    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
+          C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
+             ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa.
+\end{itemize}
+
 \section{Testausmenetelmät}
 
 \subsection{Luokittelu}
