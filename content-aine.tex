@@ -18,12 +18,26 @@ Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, 
 
 \section{Yleisiä tietoturvaongelmia}
 
+Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
+(trust boundary) ylitys.
+Esimerkiksi jos jokin palvelun kaatavan ohjelmointivirheen voi laukaista pelkästään järjestelmän
+ylläpitäjä, ei kyseisellä virheellä ole suurta tietoturvamerkitystä.
+Lähes samaan lopputulokseenhan päädytään jos ylläpitäjä sammuttaa palvelun tavallisia keinoja käyttämällä.
+Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsee lukemaan käyttäjän tiedostoja,
+on tilanne vakavampi, koska web-sivujen katselemisen tarkoitus on olla turvallista ja selaimen siten
+kuuluu estää sovelmien pääsy tiedostojärjestelmään.
+Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
+tai käyttöjärjestelmätilassa rikkoo luottamusrajan.
+
+\subsection{Muistiturvallisuus}
+
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
 Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}, JOTAIN.
 Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
 joita tehokkuussyistä edelleen käytetään laajasti.
 
-Muistivirheet ilmenevät useimmiten prosessin tappamisena tietyllä käyttöjärjestelmäkohtaisella virhekoodilla.
+Muistivirheet ilmenevät useimmiten prosessin tappamisena tietyllä
+käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
 Unix-pohjaisissa järjestelmissä tämä virhe on tunnettu `Segmentation fault'.
 % ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
@@ -37,17 +51,24 @@ Kriittisimmät muistivirheet voivat mahdollistaa hyökkääjän suorittaa mieliv
 Muistivirheiksi luokitellaan tyypillisesti seuraavat:
 
 \begin{itemize}
-    \item Taulukon yli- ja alivuodot: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
+    \item Taulukon yli tai ali indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
           ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
           Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu.
           Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
             ajonaikaympäristön tietorakenteisiin.
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
-            sijaitsevan funktion paluuosoitteen ylikirjoittaminen,
-          josta ei ole pitkä matka mielivaltaisen koodin suoritukseen.
+            sijaitsevan funktion paluuosoitteen ylikirjoittaminen.
+          Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
     \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
              ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa.
+          Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
+          Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
+          Jo C:n standardikirjastosta löytyy funktioita,
+          joille ei ole ollenkaan mahdollista antaa tulospuskurin kokoa ja siten aiheuttavat
+          ylivuodon jos tulos ei mahdu puskuriin.
+          Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
+          Näistä syistä puskurin ylivuodot pinossa ovat ylivoimaisesti yleisin syy RCE-haavoittuvuuksille.
 \end{itemize}
 
 \section{Testausmenetelmät}
@@ -60,8 +81,6 @@ Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellyt
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
-Näissä molemmissa on palvelunestohyökkäyksen (DoS, Denial of Service) uhka,
-sekä edeltävässä mahdollisesti myös ulkopuolisen koodin suorituksen mahdollisuus (RCE, Remote Code Execution)~\cite{StaticCodeAnalysis}.
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
