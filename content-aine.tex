@@ -1,12 +1,12 @@
 \section{Johdanto}
 
-Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä.
+Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä:
 Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
 sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
 Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
 aiheutui yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
-Selvästi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
+Siksi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
 
 Tietoturvaongelmia voi yrittää löytää manuaalisesti tutkimalla ohjelman lähdekoodia,
 mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
@@ -73,14 +73,13 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
 
 \section{Testausmenetelmät}
 
-\subsection{Luokittelu}
-\subsection{Testauksen kriteereitä}
-
 Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
 Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
-Selkeitä epätoivottuja tapahtumia ovat kaatumiset (esimerkiksi luku/kirjoitus muistialueen ulkopuolelta) ja jumiutumiset (esimerkiksi ikisilmukat).
+Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi ikisilmukat).
+
+\subsection{Luokittelu}
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
@@ -94,6 +93,8 @@ Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tämänkaltaiseen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
 tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
+
+\subsection{Testauksen kriteereitä}
 
 Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä} ja \emph{fuzzausta}.
 
@@ -109,13 +110,14 @@ esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
 
 \section{Fuzzaus}
 
-\emph{Fuzzaus} on brute force -keino automaattiseen tietoturvatestaukseen.
+\emph{Fuzzaus} on raa'an voiman keino automaattiseen tietoturvatestaukseen.
 Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
-Esimerkiksi erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
-voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
-Aritmetiikka suurilla luvuilla voi aiheuttaa ylivuotoja laskennassa,
-ja taulukoiden varomaton indeksointi voi mennä yli tai ali taulukolle varatun muistialueen.
+Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella:
+normaalia reilusti pidemmät merkkijonot voivat ylivuotaa kiinteäkokoisia puskureita.
+Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
+voivat olla ongelmallisia~\cite{ViolatingAssumptions}
+esimerkiksi ylivuotamalla laskutoimituksia.
 
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
 esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
