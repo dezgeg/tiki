@@ -90,10 +90,14 @@
 
 
 \maketitle        % title page
-\makeabstract     % abstract page
+% \makeabstract     % abstract page
 
+\pagenumbering{roman}
 \tableofcontents  % table of contents
+\thispagestyle{plain} % hack
 \newpage          % clear page after the table of contents
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 
 % --- Main matter ---
