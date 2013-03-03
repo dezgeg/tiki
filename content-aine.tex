@@ -5,10 +5,10 @@ Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmie
 sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
 Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
-aiheutui yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
+arvioidaan aiheutuneen yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
 Siksi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
 
-Tietoturvaongelmia voi yrittää löytää manuaalisesti tutkimalla ohjelman lähdekoodia,
+Tietoturvaongelmia voi yrittää löytää käsityönä tutkimalla ohjelman lähdekoodia,
 mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
 tai avoimen lähdekoodin ohjelmille.
 Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
@@ -32,9 +32,10 @@ tai käyttöjärjestelmätilassa rikkoo luottamusrajan.
 \subsection{Muistiturvallisuus}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
-Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}, JOTAIN.
+Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus},
+eli tunnistaako ajonaikainen ympäristö kiellettyjen muistiviitteiden tekemisen.
 Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
-joita tehokkuussyistä edelleen käytetään laajasti.
+joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting}.
 
 Muistivirheet ilmenevät useimmiten prosessin tappamisena tietyllä
 käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
@@ -64,7 +65,7 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
              ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa.
           Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
           Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
-          Jo C:n standardikirjastosta löytyy funktioita,
+          Jo C:n standardikirjastosta löytyy funktioita~\cite{StaticallyDetecting},
           joille ei ole ollenkaan mahdollista antaa tulospuskurin kokoa ja siten aiheuttavat
           ylivuodon jos tulos ei mahdu puskuriin.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
@@ -87,7 +88,7 @@ testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon o
 Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
 ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
-tai perinteiselle komentoriviohjelmalle komentoriviparametrien kautta.
+tai komentoriviohjelmalle annetaan syöte normaalisti komentoriviparametrien kautta.
 
 Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
@@ -100,13 +101,37 @@ Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staa
 
 \section{Staattinen analyysi}
 
-Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiin perustuvia whitebox-menetelmiä.
-Tällaiset menetelmät yrittävät paikantaa ohjelmiston lähdekoodista tyypillisiä ohjelmointivirheitä.
+Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
+Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
 Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
 ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
-esimerkiksi Coverity-yhtiön tuotteet~\cite{Coverity}.
+esimerkiksi Coverity~\cite{Coverity}.
+
+\subsection{Lint}
+
+Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
+Lintin fokuksena ei ollut tietoturvaongelmat,
+vaan yksinkertaiset ohjelmointivirheet, C-kääntäjää tarkempi tyypintarkastus sekä siirrettävyysongelmat.
+Esimerkiksi:
+
+\begin{itemize}
+    \item Alustamattoman muuttujan arvon käyttö.
+    \item Käyttämättömät muuttujat tai funktiot.
+    \item Saavuttamattomat koodirivit.
+    \item ``järjettömät'' vertailut.
+           Esimerkiksi etumerkittömälle kokonaislukumuuttujalle \texttt{x} ei ehtolauseke
+           \texttt{if (x < 0)} ole koskaan tosi.
+   \item Yllättävä operaattoripresedenssi.
+         Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
+         mutta C:ssä \texttt{==}-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
+         jollon ehtolausekkeen tulokseksi tulee aina 0.
+\end{itemize}
+
+Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
+joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle.
+Nykyiset kääntäjät osaavat varoittaa edellämainituista virheistä jo käännösaikana.
 
 \section{Fuzzaus}
 
@@ -129,13 +154,20 @@ jolloin hyökkäyspinta-alaakin on runsaasti.
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
 \begin{itemize}
     \item Yksinkertaisimmillaan syöte voi olla lähes pelkkää satunnaista dataa.
-          Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä ilman sen kummempaa rakennetta,
-          jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja tavuja~\cite{UnixReliability}.
+          Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä
+          ilman sen kummempaa rakennetta,
+          jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja
+          tavuja~\cite{UnixReliability} on riittävä syöte ohjelmalle.
     \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
-    \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstivapaan kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
+    \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstittoman kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
     \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
 
 \subsection{Testitapausten generointi}
 
 \section{Yhteenveto}
+Tässä tutkielmassa tarkasteltiin kahta menetelmää ohjelmistojen tietoturvatestaamiseen,
+staattista analyysia ja fuzzausta.
+Huomattavaa on, että koska osa tietoturvaongelmista on seurausta ohjelmointivirheistä,
+niin tietoturvan parantamiseen soveltuu ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
+Kuitenkin fuzzaus testausmenetelmänä on toimiva menetelmä erityisesti tietoturvaongelmien löytämiseen.

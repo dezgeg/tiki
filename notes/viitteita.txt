@@ -64,6 +64,14 @@ Violating Assumptions with Fuzzing
 http://www.ida.liu.se/~TDDC90/literature/papers/violating05.pdf
     - trust boundary
 
+Statically detecting likely buffer overflow vulnerabilities
+http://dl.acm.org/citation.cfm?id=1251327.1251341
+    - C-kirjaston epäturvalliset funktiot
+    - C ei tarkista nopeuden takia
+
+http://www.cs.virginia.edu/~evans/pubs/ieeesoftware.pdf
+    - ihmisten code reviewit
+    - kaikenlaista hyödyllistä lähdettä
 
 Kirjoja:
 
