@@ -73,6 +73,10 @@ http://www.cs.virginia.edu/~evans/pubs/ieeesoftware.pdf
     - ihmisten code reviewit
     - kaikenlaista hyödyllistä lähdettä
 
+Undangle: early detection of dangling pointers in use-after-free and double-free vulnerabilities
+http://doi.acm.org/10.1145/2338965.2336769
+    - double free == exploitable!
+
 Kirjoja:
 
 Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]

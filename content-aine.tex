@@ -70,6 +70,34 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           ylivuodon jos tulos ei mahdu puskuriin.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
           Näistä syistä puskurin ylivuodot pinossa ovat ylivoimaisesti yleisin syy RCE-haavoittuvuuksille.
+    \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
+          alusteta mitenkään.
+          Tällaisen muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
+          sinne sattunut kirjoittamaan.
+          Jos tällaista muistia sitten näytetään jossain muodossa käyttäjälle,
+          saattaa käyttäjälle vuotaa joko ohjelman salaisia tietoja
+          tai riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden tekoa.
+          Tai vaihtoehtoisesti alustamaton osoitinmuuttuja johtaa usein ohjelman kaatumiseen.
+
+\end{itemize}
+Edellisten lisäksi C-ohjelmoijan täytyy huoleehtia dynaamisesti varatun muistin vapauttamisesta.
+Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
+
+\begin{itemize}
+    \item Muistivuodot: Jos ohjelmoija unohtaa vapauttaa dynaamisesti varatun muistialueen
+          sen jälkeen kun sitä ei enää käytetä,
+          jää tuo muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
+          Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen,
+          mikäli lisääntynyt muistinkäyttö johtaa ohjelman sivutukseen levylle.
+    \item Muistin vapauttaminen useasti (nk. double free):
+          Varattua muistialuetta ei saa vapauttaa kuin yhden kerran,
+          koska esimerkiksi vapauttamisen jälkeen sama muistialue voidaan antaa jonkun toisen
+          muistivarauksen käyttöön,
+          mikä näinollen aiheuttaisi jonkun toisen, täysin liittymättömän muistialueen vapauttamisen.
+          Yleensä vapautetun muistialueen vapauttaminen uudelleen aiheuttaa muistinhallintakirjaston
+          sisäisten tietorakenteiden korruptoitumisen ja
+          johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
+
 \end{itemize}
 
 \section{Testausmenetelmät}
@@ -131,7 +159,29 @@ Esimerkiksi:
 
 Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
 joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle.
+Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
+kun taas Lint tarkastelee tiedostoja kokonaisuutena,
+mikä mahdollistaa tarkemman analyysin.
 Nykyiset kääntäjät osaavat varoittaa edellämainituista virheistä jo käännösaikana.
+
+Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
+Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
+Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelmisto on Splint
+(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint.
+
+Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
+mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
+Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi nk. constraint solving-ongelmana
+(mitä tämä on suomeksi?).
+Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
+\emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
+Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
+saa olla \texttt{NULL} sekä kohdepuskurin täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
+Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
+esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
+koko annettiin parametrinä.
+Nyt jos Splint ei saa osoitettua, että alkuehdot pätevät aina,
+varoittaa se mahdollisesta puskurin ylivuodosta.
 
 \section{Fuzzaus}
 
