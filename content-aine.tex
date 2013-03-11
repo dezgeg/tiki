@@ -142,7 +142,7 @@ Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staa
 \section{Staattinen analyysi}
 
 Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
-Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä.
+Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
 Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
@@ -152,9 +152,9 @@ esimerkiksi Coverity~\cite{Coverity}.
 \subsection{Lint}
 
 Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
-Lintin fokuksena ei ollut tietoturvaongelmat,
+Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
 vaan yksinkertaiset ohjelmointivirheet, C-kääntäjää tarkempi tyypintarkastus sekä siirrettävyysongelmat.
-Esimerkiksi:
+Lint osaa varoittaa esimerkiksi seuraavista virheistä:~\cite{Lint}
 
 \begin{itemize}
     \item Alustamattoman muuttujan arvon käyttö.
@@ -174,7 +174,9 @@ joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle.
 Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
 kun taas Lint tarkastelee tiedostoja kokonaisuutena,
 mikä mahdollistaa tarkemman analyysin.
-Nykyiset kääntäjät osaavat varoittaa edellämainituista virheistä jo käännösaikana.
+Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä jo käännösaikana,
+ja uudempien ohjelmointikielten, esimerkiksi Javan, spesifikaatiot vaativat tällaiset
+tarkistukset~\cite[22.3]{Sommerville}.
 
 Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
 Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
@@ -183,34 +185,36 @@ Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelm
 
 Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
 mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
-Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi nk. constraint solving-ongelmana
-(mitä tämä on suomeksi?).
+Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi lausekalkyylin toteutuvuusongelmana
+(\emph{satisfiability problem}).
 Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
 \emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
 Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
-saa olla \texttt{NULL} sekä kohdepuskurin täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
+saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
 Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
 esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
 koko annettiin parametrinä.
-Nyt jos Splint ei saa osoitettua, että alkuehdot pätevät aina,
-varoittaa se mahdollisesta puskurin ylivuodosta.
+Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
+puskurin turvallisen käytön edellyttämistä ehdoista ja
+puskurin todellisen koon aiheuttamista ehdoista ristiriita.
+Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen.
 
 \section{Fuzzaus}
 
-\emph{Fuzzaus} on raa'an voiman keino automaattiseen tietoturvatestaukseen.
-Fuzzauksen tarkoitus on generoida satunnaisia syötteitä testattavalle ohjelmalle siinä toivossa,
+\emph{Fuzzaus} on yleisesti käytetty keino automaattiseen testisyötteiden generointiin.
+Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
 Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella:
 normaalia reilusti pidemmät merkkijonot voivat ylivuotaa kiinteäkokoisia puskureita.
 Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
-voivat olla ongelmallisia~\cite{ViolatingAssumptions}
-esimerkiksi ylivuotamalla laskutoimituksia.
+voivat olla ongelmallisia~\cite{ViolatingAssumptions},
+aiheuttaen esimerkiksi aritmeettisiä ylivuotoja laskutoimituksissa.
 
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
 esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
 HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
 Tämä on varsin suuri määrä koodia,
-joka ottaa syötteekseen tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
+joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
 jolloin hyökkäyspinta-alaakin on runsaasti.
 
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
@@ -220,9 +224,12 @@ Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina
           ilman sen kummempaa rakennetta,
           jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja
           tavuja~\cite{UnixReliability} on riittävä syöte ohjelmalle.
-    \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} lisäämällä, poistamalla, muokkaamalla jne. satunnaisesti.
-    \item Rakenteellisesti (enimmäkseen) kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan luoda esimerkiksi kontekstittoman kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
-    \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä, jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
+    \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} esimerkiksi
+          lisäämällä, poistamalla tai muokkaamalla sen osia.
+    \item Rakenteellisesti enimmäkseen kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan
+          luoda esimerkiksi kontekstittoman kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
+    \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä,
+          jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
 
 \subsection{Testitapausten generointi}
