@@ -19,7 +19,7 @@ Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, 
 Tarkastellaan aluksi kappaleessa \ref{YleinenTietoturva} C-kielisissä ohjelmissa yleisiä tietoturvaongelmia,
 muistivirheitä, sekä kappaleesta \ref{Testausmenetelmat} eteenpäin yleisiä tietoturvatestaamisen menetelmiä.
 
-\section{Yleisiä tietoturvaongelmia}
+\section{Muistiturvallisuus}
 \label{YleinenTietoturva}
 
 Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
@@ -35,7 +35,7 @@ kuuluu estää sovelmien pääsy tiedostojärjestelmään.
 Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
 tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
 
-\subsection{Muistiturvallisuus}
+% \subsection{Muistiturvallisuus}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
 Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}~\cite{SoftBound},
@@ -45,7 +45,7 @@ joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting,
 
 Muistivirheet ilmenevät useimmiten prosessin keskeytymisenä tietyllä
 käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
-Unix-pohjaisissa järjestelmissä tämä virhe on tunnettu `Segmentation fault'.
+Unix-pohjaisissa järjestelmissä tämä tunnetaan segmentointivirheenä (Segmentation fault).
 % ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
 mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
@@ -125,18 +125,18 @@ Perehdytäänkin seuraavassa kappaleessa näihin testausmenetelmiin.
 \section{Testausmenetelmät}
 \label{Testausmenetelmat}
 
-Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
+Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite[23.1]{Sommerville}.
 Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi ikisilmukat).
 
-\subsection{Luokittelu}
+% \subsection{Luokittelu}
 
 Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti
 \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon
-ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
+ohjelmiston sisäisen rakenteen toimintaan~\cite{OuluBrowser}.
 
 Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
 ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä~\cite{OuluBrowser}.
@@ -146,8 +146,6 @@ Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
 tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\cite{OuluBrowser}.
-
-\subsection{Testauksen kriteereitä}
 
 Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä}
 kappaleessa \ref{StaattinenAnalyysi} ja \emph{fuzzausta} kappaleessa \ref{Fuzzaus}.
@@ -163,7 +161,7 @@ Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintä
 ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
 esimerkiksi Coverity~\cite{Coverity}.
 
-\subsection{Lint}
+% \subsection{Lint}
 
 Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
 Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
@@ -195,12 +193,12 @@ esimerkiksi Javan, spesifikaatiot vaativat tällaiset tarkistukset~\cite[22.3]{S
 Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
 Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
 Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelmisto on Splint
-(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint.
+(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint~\cite{SplintLCLint}.
 
 Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
 mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
 Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi lausekalkyylin toteutuvuusongelmana
-(\emph{satisfiability problem}).
+(\emph{satisfiability problem})~\cite{SplintLCLint}.
 Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
 \emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
 Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
@@ -211,7 +209,7 @@ koko annettiin parametrinä.
 Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
 puskurin turvallisen käytön edellyttämistä ehdoista ja
 puskurin todellisen koon aiheuttamista ehdoista ristiriita.
-Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen.
+Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
 
 \section{Fuzzaus}
 \label{Fuzzaus}
@@ -219,17 +217,30 @@ Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen.
 \emph{Fuzzaus} on yleisesti käytetty keino automaattiseen testisyötteiden generointiin.
 Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
-Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella:
-normaalia reilusti pidemmät merkkijonot voivat ylivuotaa kiinteäkokoisia puskureita.
+Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
+% Tyhmä esimerkki, viimeistele?
+% Esimerkiksi useimmat maailmalla olevat äänitiedostot sisältävät suurella todennäköisyydellä vain kaksi äänikanavaa.
+% Luultavasti tätä yleisintä tapausta on myöskin testattu enemmän ja muut kanavamäärät ovat jääneet vähemmälle testaamiselle.
+% Fuzzeri sen sijaan saattaakin luoda äänitiedostoja, joissa on esimerkiksi 0, -89 tai 4000000 äänikanavaa.
 Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
-voivat olla ongelmallisia~\cite{ViolatingAssumptions},
-aiheuttaen esimerkiksi aritmeettisiä ylivuotoja laskutoimituksissa.
+voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
+Liian suurista luvuista voi aiheutua aritmeettisiä ylivuotoja laskutoimituksissa.
+Esimerkiksi monissa tiedostoformaateissa täytyy lukea levyltä tietoa taulukoihin.
+Jos esimerkiksi pitää luoda taulukko 128-tavuisia merkkijonoja varten siten,
+että taulukon alkioiden lukumäärä luetaan 32-bittisestä kentästä tiedostossa,
+voi käydä huonosti muistia varatessa.
+Tiedostossa annettu taulukon koko saattaa olla niin suuri,
+että laskutoimitus \texttt{128 * koko}, eli taulukon koko tavuina,
+saattaakin ylivuotaa 32-bittisen muuttujan siten,
+että ohjelma varaakin vain $128$ tavua muistia taulukolle,
+kun oikeasti pitäisi varata $2^{32} + 128$ tavua.
+Tämä johtaa hyvin nopeasti puskurin ylivuotoon.
 
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
 esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
 HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
 Tämä on varsin suuri määrä koodia,
-joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
+joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäluotettavasta lähteestä, Internetistä,
 jolloin hyökkäyspinta-alaakin on runsaasti~\cite{OuluBrowser}.
 
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita
@@ -244,14 +255,22 @@ aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
           lisäämällä, poistamalla tai muokkaamalla sen osia.
     \item Rakenteellisesti enimmäkseen kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan
           luoda esimerkiksi kontekstittoman kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
-    \item Ohjelman suoritusta voidaan analysoida symbolisesti välttämään syötteitä,
-          jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
+    \item Ohjelman suoritusta voidaan analysoida symbolisesti, jotta voidaan
+          selvittää minkälainen vaikutus syötteellä on ohjelman tilaan~\cite{SageArtikkeli}
+          ja mahdollisesti karsia pois `hyödyttömiä' syötteitä.
+          Esimerkiksi jos voidaan päätellä, että jollekkin syötetavulle ei tehdä mitään muuta kuin
+          verrata sen yhtäsuuruutta lukuun nolla,
+          niin voidaan jättää tarkastelematta kaikki ykköstä suuremmat arvot.
+          Tällaisilla arvoillahan ohjelma käyttäytyisi tasan samalla lailla
+          kuin jos syötteenä olisi ykkönen,
+          jolloin mitään uutta informaatiota ohjelman toiminnasta ei saataisi.
+
 \end{itemize}
 
 Käsitellään seuraavaksi joitakin edellämainittuja keinoja generoida syötteitä.
-
-\subsection{Testitapausten generointi}
-
+%
+% \subsection{Testitapausten generointi}
+%
 Fuzzauksen historia alkaa kirjaimellisesti synkkänä ja myrskyisenä yönä,
 jolloin sään aiheuttamat tiedonsiirtovirheet modeemiyhteydessä koituivat ongelmaksi
 eräälle alkuperäisen fuzzauspaperin kirjoittajalle.
