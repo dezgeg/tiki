@@ -54,30 +54,41 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
 \begin{itemize}
     \item Taulukon yli tai ali indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
           ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
-          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu.
+          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu~\cite[6.5.6]{CSpec}.
+% An array subscript is out of range, even if an object is apparently accessible with the
+% given subscript (...) (6.5.6).
           Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
-            ajonaikaympäristön tietorakenteisiin.
+          ajonaikaisympäristön tietorakenteisiin.
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
-            sijaitsevan funktion paluuosoitteen ylikirjoittaminen.
+          sijaitsevan funktion paluuosoitteen ylikirjoittaminen.
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
     \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
-             ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa.
+          ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[7.24.1]{CSpec}.
+% If an array is accessed beyond the end of an object, the behavior is undefined.
           Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
           Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
-          Jo C:n standardikirjastosta löytyy funktioita~\cite{StaticallyDetecting},
-          joille ei ole ollenkaan mahdollista antaa tulospuskurin kokoa ja siten aiheuttavat
-          ylivuodon jos tulos ei mahdu puskuriin.
+          Jo C:n standardikirjastosta löytyy funktioita joille ei ole ollenkaan mahdollista antaa tulospuskurin
+          kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting}.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
           Näistä syistä puskurin ylivuodot pinossa ovat ylivoimaisesti yleisin syy RCE-haavoittuvuuksille.
     \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
           alusteta mitenkään.
-          Tällaisen muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
+          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[6.3.2.1, 7.22.3.4]{CSpec},
+          mutta yleensä alustamattoman muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
           sinne sattunut kirjoittamaan.
+% An lvalue designating an object of automatic storage duration that could have been
+% declared with the register storage class is used in a context that requires the value
+% of the designated object, but the object is uninitialized. (6.3.2.1).
+%
+% The malloc function allocates space for an object whose size is specified by size and
+% whose value is indeterminate. (7.22.3.4)
           Jos tällaista muistia sitten näytetään jossain muodossa käyttäjälle,
-          saattaa käyttäjälle vuotaa joko ohjelman salaisia tietoja
-          tai riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden tekoa.
-          Tai vaihtoehtoisesti alustamaton osoitinmuuttuja johtaa usein ohjelman kaatumiseen.
+          saattaa käyttäjälle vuotaa esimerkiksi ohjelman käyttämiä salausavaimia,
+          ohjelman muille käyttäjille kuuluvaa tietoa tai
+          riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden tekoa.
+          Vaihtoehtoisesti alustamattoman osoitinmuuttujan käyttö johtaa hyvin todennäköisesti uusiin muistivirheisiin
+          ja ohjelman kaatumiseen.
 
 \end{itemize}
 Edellisten lisäksi C-ohjelmoijan täytyy huoleehtia dynaamisesti varatun muistin vapauttamisesta.
@@ -89,14 +100,15 @@ Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
           jää tuo muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
           Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen,
           mikäli lisääntynyt muistinkäyttö johtaa ohjelman sivutukseen levylle.
-    \item Muistin vapauttaminen useasti (nk. double free):
-          Varattua muistialuetta ei saa vapauttaa kuin yhden kerran,
-          koska esimerkiksi vapauttamisen jälkeen sama muistialue voidaan antaa jonkun toisen
-          muistivarauksen käyttöön,
+      \item Muistin vapauttaminen useasti (\emph{double free}):
+          Varattua dynaamista muistialuetta ei saa vapauttaa kuin yhden kerran.
+          Muistialueen vapauttamisen jälkeen sama muistialue voidaan antaa esimerkiksi
+          ohjelman jonkun toisen moduulin muistivarauksen käyttöön.
+          Jos nyt alkuperäistä, jo vapautettua muistialuetta yritetään vapauttaa,
           mikä näinollen aiheuttaisi jonkun toisen, täysin liittymättömän muistialueen vapauttamisen.
           Yleensä vapautetun muistialueen vapauttaminen uudelleen aiheuttaa muistinhallintakirjaston
-          sisäisten tietorakenteiden korruptoitumisen ja
-          johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
+          sisäisten tietorakenteiden korruptoitumisen,
+          joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
 
 \end{itemize}
 
@@ -148,13 +160,13 @@ Esimerkiksi:
     \item Alustamattoman muuttujan arvon käyttö.
     \item Käyttämättömät muuttujat tai funktiot.
     \item Saavuttamattomat koodirivit.
-    \item ``järjettömät'' vertailut.
+    \item ``Järjettömät'' vertailut.
            Esimerkiksi etumerkittömälle kokonaislukumuuttujalle \texttt{x} ei ehtolauseke
            \texttt{if (x < 0)} ole koskaan tosi.
    \item Yllättävä operaattoripresedenssi.
          Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
-         mutta C:ssä \texttt{==}-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
-         jollon ehtolausekkeen tulokseksi tulee aina 0.
+         mutta C:ssä \texttt{==}\,-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
+         jollon ehtolausekkeen tulokseksi tulee aina \texttt{0}.
 \end{itemize}
 
 Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
