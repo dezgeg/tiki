@@ -81,6 +81,15 @@ Undangle: early detection of dangling pointers in use-after-free and double-free
 http://doi.acm.org/10.1145/2338965.2336769
     - double free == exploitable!
 
+Security: The Root of the Problem
+    - kääntäjien varoitukset
+
+Improving Security Using Extensible Lightweight Static Analysis
+    - Splint + LCLint
+    - Paljon esim. stack smashingista
+    - Format string
+
+
 Kirjoja:
 
 Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]
