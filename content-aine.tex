@@ -16,18 +16,24 @@ disassembler-ohjelmalla symboliselle konekielelle
 ja tutkia ohjelmaa konekielitasolla.
 Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
 
+Tarkastellaan aluksi kappaleessa \ref{YleinenTietoturva} C-kielisissä ohjelmissa yleisiä tietoturvaongelmia,
+muistivirheitä, sekä kappaleesta \ref{Testausmenetelmat} eteenpäin yleisiä tietoturvatestaamisen menetelmiä.
+
 \section{Yleisiä tietoturvaongelmia}
+\label{YleinenTietoturva}
 
 Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
-(trust boundary) ylitys.
-Esimerkiksi jos jokin palvelun kaatavan ohjelmointivirheen voi laukaista pelkästään järjestelmän
-ylläpitäjä, ei kyseisellä virheellä ole suurta tietoturvamerkitystä.
-Lähes samaan lopputulokseenhan päädytään jos ylläpitäjä sammuttaa palvelun tavallisia keinoja käyttämällä.
+(trust boundary) ylitys~\cite{ViolatingAssumptions}.
+Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii käyttäjältä pääsyä
+ylläpitäjän hallintavalikkoon, ei kyseisellä virheellä ole suhteellisesti kovin suurta tietoturvamerkitystä.
+Jos käyttäjällä kerran on ylläpitäjän oikeudet, niin samaan lopputulokseenhan päädytään mikäli kyseinen
+käyttäjä yksinkertaisesti sammuttaa palvelimen tavallisia keinoja käyttäen.
 Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsee lukemaan käyttäjän tiedostoja,
-on tilanne vakavampi, koska web-sivujen katselemisen tarkoitus on olla turvallista ja selaimen siten
+on tilanne vakavampi,
+koska web-sivujen katselemisen tarkoitus on olla turvallista ja selaimen siten
 kuuluu estää sovelmien pääsy tiedostojärjestelmään.
 Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
-tai käyttöjärjestelmätilassa rikkoo luottamusrajan.
+tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
 
 \subsection{Muistiturvallisuus}
 
@@ -37,17 +43,18 @@ eli tunnistaako ajonaikainen ympäristö kiellettyjen muistiviitteiden tekemisen
 Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
 joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting}.
 
-Muistivirheet ilmenevät useimmiten prosessin tappamisena tietyllä
+Muistivirheet ilmenevät useimmiten prosessin keskeytymisenä tietyllä
 käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
 Unix-pohjaisissa järjestelmissä tämä virhe on tunnettu `Segmentation fault'.
 % ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
-mahdollistaa muistivirheen olemassaolo palvelunestohyökkäyksen eli DoS, denial-of-service-hyökkäyksen.
-Lisäseurauksena prosessin pakotetusta kuolemasta on se,
-ettei prosessilla ole mahdollisuutta siivota jotakin säilyvää tilaa,
-esimerkiksi väliaikaistiedostoja.
+mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
+Kriittisimmillään muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia
+ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
+Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla muitakin lisäseurauksia.
+Esimerkiksi prosessilla ei ole mahdollisuutta siivota jotakin säilyvää tilaa,
+kuten väliaikaistiedostoja.
 Hallitsematon kuolema voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
-Kriittisimmät muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
 
 Muistivirheiksi luokitellaan tyypillisesti seuraavat:
 
@@ -60,7 +67,7 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
           ajonaikaisympäristön tietorakenteisiin.
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
-          sijaitsevan funktion paluuosoitteen ylikirjoittaminen.
+          sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting}.
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
     \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
@@ -74,7 +81,7 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Näistä syistä puskurin ylivuodot pinossa ovat ylivoimaisesti yleisin syy RCE-haavoittuvuuksille.
     \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
           alusteta mitenkään.
-          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[6.3.2.1, 7.22.3.4]{CSpec},
+          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[6.3.2.1 ja 7.22.3.4]{CSpec},
           mutta yleensä alustamattoman muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
           sinne sattunut kirjoittamaan.
 % An lvalue designating an object of automatic storage duration that could have been
@@ -109,10 +116,14 @@ Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
           Yleensä vapautetun muistialueen vapauttaminen uudelleen aiheuttaa muistinhallintakirjaston
           sisäisten tietorakenteiden korruptoitumisen,
           joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
-
 \end{itemize}
 
+Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
+kykenevät löytämään muistivirheitä.
+Perehdytäänkin seuraavassa kappaleessa näihin testausmenetelmiin.
+
 \section{Testausmenetelmät}
+\label{Testausmenetelmat}
 
 Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite{Sommerville}.
 Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
@@ -122,14 +133,15 @@ Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkik
 
 \subsection{Luokittelu}
 
-Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti \emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
-testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
+Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti
+\emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon
+ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
 
 Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
 ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
 tai komentoriviohjelmalle annetaan syöte normaalisti komentoriviparametrien kautta.
-
 Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
@@ -137,9 +149,11 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
 
 \subsection{Testauksen kriteereitä}
 
-Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä} ja \emph{fuzzausta}.
+Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä}
+kappaleessa \ref{StaattinenAnalyysi} ja \emph{fuzzausta} kappaleessa \ref{Fuzzaus}.
 
 \section{Staattinen analyysi}
+\label{StaattinenAnalyysi}
 
 Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
 Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
@@ -200,6 +214,7 @@ puskurin todellisen koon aiheuttamista ehdoista ristiriita.
 Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen.
 
 \section{Fuzzaus}
+\label{Fuzzaus}
 
 \emph{Fuzzaus} on yleisesti käytetty keino automaattiseen testisyötteiden generointiin.
 Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
@@ -215,9 +230,10 @@ esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
 HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
 Tämä on varsin suuri määrä koodia,
 joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäturvallisesta Internetistä,
-jolloin hyökkäyspinta-alaakin on runsaasti.
+jolloin hyökkäyspinta-alaakin on runsaasti~\cite{OuluBrowser}.
 
-Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
+Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita
+aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
 \begin{itemize}
     \item Yksinkertaisimmillaan syöte voi olla lähes pelkkää satunnaista dataa.
           Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä
@@ -253,7 +269,7 @@ tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
 Testattavalle ohjelmalle annettu syöte voi ohjelmasta riippuen olla
 hyvinkin erityyppistä kuin edellä esitelty tavujonoista koostuva syöte.
 Esimerkiksi graafisen käyttöliittymän toteutus toimii usein tapahtumapohjaisesti:
-sekä Unixin X11, Mac OS X:n Aqua sekä Windowsin ikkunanhallinta on toteutettu näin.
+sekä Unixin X11:n, Mac OS X:n Aquan sekä Microsoft Windowsin ikkunanhallinta on toteutettu näin.
 Näihin graafisiin järjestelmiin perustuvia ohjelmia voi siten fuzzata lähettämällä
 niille esimerkiksi tekaistuja näppäimistön painalluksia tai hiiren liikkeitä vastaavia
 sanomia~\cite{X11Fuzz,MacOsFuzz,WinNtFuzz}.
@@ -264,7 +280,8 @@ fuzzaamiseen~\cite{RegFuzz}.
 Regfuzz lähtee rakentamaan säännöllistä lauseketta pala kerrallaan sisältä ulospäin:
 liikkeelle lähdetään tyhjästä merkkijonosta ja siihen lisätään joko täysin
 satunnaisia merkkejä tai valideja rakenteita,
-kuten sulkeita, merkkijoukkoja (\texttt{[\^a-z]}) ja operaattoreita (\texttt{+}, \texttt{*}).
+kuten muun muassa sulkeita, merkkijoukkoja (esimerkiksi \texttt{[\^{}a-z]}) ja
+operaattoreita (kuten \texttt{+}, \texttt{*}).
 Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke.
 
 \section{Yhteenveto}
