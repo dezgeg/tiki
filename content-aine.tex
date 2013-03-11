@@ -38,10 +38,10 @@ tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumption
 \subsection{Muistiturvallisuus}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
-Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus},
+Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}~\cite{SoftBound},
 eli tunnistaako ajonaikainen ympäristö kiellettyjen muistiviitteiden tekemisen.
 Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
-joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting}.
+joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting,SoftBound}.
 
 Muistivirheet ilmenevät useimmiten prosessin keskeytymisenä tietyllä
 käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
@@ -67,7 +67,7 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
           ajonaikaisympäristön tietorakenteisiin.
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
-          sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting}.
+          sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting,SplintLCLint}.
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
     \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
@@ -76,14 +76,14 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
           Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
           Jo C:n standardikirjastosta löytyy funktioita joille ei ole ollenkaan mahdollista antaa tulospuskurin
-          kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting}.
+          kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting,SplintLCLint}.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
-          Näistä syistä puskurin ylivuodot pinossa ovat ylivoimaisesti yleisin syy RCE-haavoittuvuuksille.
+          Puskurin ylivuodot pinossa ovatkin yleinen syy RCE-haavoittuvuuksille~\cite{SplintLCLint}.
     \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
           alusteta mitenkään.
           Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[6.3.2.1 ja 7.22.3.4]{CSpec},
           mutta yleensä alustamattoman muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
-          sinne sattunut kirjoittamaan.
+          sinne sattunut kirjoittamaan~\cite{SecurityRootOfTheProblem}.
 % An lvalue designating an object of automatic storage duration that could have been
 % declared with the register storage class is used in a context that requires the value
 % of the designated object, but the object is uninitialized. (6.3.2.1).
@@ -105,7 +105,7 @@ Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
     \item Muistivuodot: Jos ohjelmoija unohtaa vapauttaa dynaamisesti varatun muistialueen
           sen jälkeen kun sitä ei enää käytetä,
           jää tuo muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
-          Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen,
+          Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen~\cite{SplintLCLint},
           mikäli lisääntynyt muistinkäyttö johtaa ohjelman sivutukseen levylle.
       \item Muistin vapauttaminen useasti (\emph{double free}):
           Varattua dynaamista muistialuetta ei saa vapauttaa kuin yhden kerran.
@@ -139,13 +139,13 @@ testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon
 ohjelmiston sisäisen rakenteen toimintaan~\cite{Sommerville}.
 
 Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
-ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä.
+ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä~\cite{OuluBrowser}.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
 tai komentoriviohjelmalle annetaan syöte normaalisti komentoriviparametrien kautta.
 Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
 Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
-tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla.
+tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\cite{OuluBrowser}.
 
 \subsection{Testauksen kriteereitä}
 
@@ -184,13 +184,13 @@ Lint osaa varoittaa esimerkiksi seuraavista virheistä:~\cite{Lint}
 \end{itemize}
 
 Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
-joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle.
+joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle~\cite{Lint}.
 Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
 kun taas Lint tarkastelee tiedostoja kokonaisuutena,
-mikä mahdollistaa tarkemman analyysin.
-Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä jo käännösaikana,
-ja uudempien ohjelmointikielten, esimerkiksi Javan, spesifikaatiot vaativat tällaiset
-tarkistukset~\cite[22.3]{Sommerville}.
+mikä mahdollistaa tarkemman analyysin~\cite{Lint}.
+Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä
+jo käännösaikana~\cite{SecurityRootOfTheProblem} ja uudempien ohjelmointikielten,
+esimerkiksi Javan, spesifikaatiot vaativat tällaiset tarkistukset~\cite[22.3]{Sommerville}.
 
 Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
 Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
