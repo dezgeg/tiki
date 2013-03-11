@@ -6,6 +6,10 @@ http://marcoramilli.blogspot.fi/2012/04/design-methodology-for-computer.html ?? 
 http://static.usenix.org/events/woot08/tech/full_papers/drewry/drewry.pdf (taviso regexit)
 
 http://pages.cs.wisc.edu/~bart/fuzz/ (klassiset fuzz-paperit)
+    - ftp://ftp.cs.wisc.edu/paradyn/technical_papers/fuzz.pdf               (UnixReliability)
+    - ftp://ftp.cs.wisc.edu/paradyn/technical_papers/fuzz-revisited.pdf     (X11Fuzz)
+    - ftp://ftp.cs.wisc.edu/paradyn/technical_papers/fuzz-nt.pdf            (WinNtFuzz)
+    - ftp://ftp.cs.wisc.edu/paradyn/technical_papers/Fuzz-MacOS.pdf         (MacOsFuzz)
 
 http://www.cloudsw.org/current-issue/201112226146 (Security Testing of Web Browsers, oulun paperi)
     - kivaa yleislätinää
@@ -82,3 +86,5 @@ Kirjoja:
 Fuzzing for Software Security Testing and Quality Assurance [melkki:Takanen.pdf, pelkkä ToC & ch1]
 Fuzzing: Brute Force Vulnerability Discovery [melkki:BruteForce.pdf]
 
+Sommerville/kirja:
+    -

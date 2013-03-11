@@ -232,7 +232,40 @@ Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita aina
           jolla ei ole vaikutusta ohjelmaan~\cite{SageArtikkeli}.
 \end{itemize}
 
+Käsitellään seuraavaksi joitakin edellämainittuja keinoja generoida syötteitä.
+
 \subsection{Testitapausten generointi}
+
+Fuzzauksen historia alkaa kirjaimellisesti synkkänä ja myrskyisenä yönä,
+jolloin sään aiheuttamat tiedonsiirtovirheet modeemiyhteydessä koituivat ongelmaksi
+eräälle alkuperäisen fuzzauspaperin kirjoittajalle.
+Tiedonsiirtovirheiden aiheuttamat satunnaiset merkit linjalle aiheutti nimittäin
+useiden Unixin peruskomentorivityökalujen kaatumisen~\cite{UnixReliability}.
+Tämän innoittamana kehitettiin \emph{fuzz}-niminen työkalu Unix-komentoriviohjelmien testaamiseen.
+
+Fuzz-ohjelma yksinkertaisesti tulosti standarditulostusvirtaansa satunnaisia tavuja,
+jotka sitten yhdistettiin Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
+Fuzzin komentoriviparametreillä pystyi hieman vaikuttamaan fuzzin generoimaan syötteeseen:
+syötteen pituuden pystyi määrittää sekä ASCII-kontrollimerkit sai kytkettyä päälle tai pois.
+Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes ollenkaan rakennetta;
+tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
+
+Testattavalle ohjelmalle annettu syöte voi ohjelmasta riippuen olla
+hyvinkin erityyppistä kuin edellä esitelty tavujonoista koostuva syöte.
+Esimerkiksi graafisen käyttöliittymän toteutus toimii usein tapahtumapohjaisesti:
+sekä Unixin X11, Mac OS X:n Aqua sekä Windowsin ikkunanhallinta on toteutettu näin.
+Näihin graafisiin järjestelmiin perustuvia ohjelmia voi siten fuzzata lähettämällä
+niille esimerkiksi tekaistuja näppäimistön painalluksia tai hiiren liikkeitä vastaavia
+sanomia~\cite{X11Fuzz,MacOsFuzz,WinNtFuzz}.
+
+Esimerkki rakenteellisen syötteen generoinnista on \emph{regfuzz}-ohjelma,
+joka on kehitelty säännöllisten lausekkeiden (regular expression) moottoreiden
+fuzzaamiseen~\cite{RegFuzz}.
+Regfuzz lähtee rakentamaan säännöllistä lauseketta pala kerrallaan sisältä ulospäin:
+liikkeelle lähdetään tyhjästä merkkijonosta ja siihen lisätään joko täysin
+satunnaisia merkkejä tai valideja rakenteita,
+kuten sulkeita, merkkijoukkoja (\texttt{[\^a-z]}) ja operaattoreita (\texttt{+}, \texttt{*}).
+Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke.
 
 \section{Yhteenveto}
 Tässä tutkielmassa tarkasteltiin kahta menetelmää ohjelmistojen tietoturvatestaamiseen,
