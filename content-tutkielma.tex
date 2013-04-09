@@ -1,0 +1,311 @@
+\section{Johdanto}
+
+Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä:
+Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
+sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
+puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
+Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
+arvioidaan aiheutuneen yhteensä noin 2,6 miljardin tappiot~\cite{CodeRed}.
+Siksi on toivottavaa, että ohjelmiston tietoturvasta voidaan varmistua ennen ohjelmiston käyttöönottoa.
+
+Tietoturvaongelmia voi yrittää löytää käsityönä tutkimalla ohjelman lähdekoodia,
+mikä tietenkin on mahdollista vain ohjelmiston varsinaisille kehittäjille
+tai avoimen lähdekoodin ohjelmille.
+Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
+disassembler-ohjelmalla symboliselle konekielelle
+ja tutkia ohjelmaa konekielitasolla.
+Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
+
+Tarkastellaan aluksi kappaleessa \ref{YleinenTietoturva} C-kielisissä ohjelmissa yleisiä tietoturvaongelmia,
+muistivirheitä, sekä kappaleesta \ref{Testausmenetelmat} eteenpäin yleisiä tietoturvatestaamisen menetelmiä.
+
+\section{Muistiturvallisuus}
+\label{YleinenTietoturva}
+
+Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
+(trust boundary) ylitys~\cite{ViolatingAssumptions}.
+Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii käyttäjältä pääsyä
+ylläpitäjän hallintavalikkoon, ei kyseisellä virheellä ole suhteellisesti kovin suurta tietoturvamerkitystä.
+Jos käyttäjällä kerran on ylläpitäjän oikeudet, niin samaan lopputulokseenhan päädytään mikäli kyseinen
+käyttäjä yksinkertaisesti sammuttaa palvelimen tavallisia keinoja käyttäen.
+Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsee lukemaan käyttäjän tiedostoja,
+on tilanne vakavampi,
+koska web-sivujen katselemisen tarkoitus on olla turvallista ja selaimen siten
+kuuluu estää sovelmien pääsy tiedostojärjestelmään.
+Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
+tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
+
+% \subsection{Muistiturvallisuus}
+
+Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
+Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}~\cite{SoftBound},
+eli tunnistaako ajonaikainen ympäristö kiellettyjen muistiviitteiden tekemisen.
+Nykypäivänä yleisimmät muistiturvallisuuden puutteesta kärsivät ohjelmointikielet ovat C ja C++,
+joita tehokkuussyistä edelleen käytetään laajasti~\cite{StaticallyDetecting,SoftBound}.
+
+Muistivirheet ilmenevät useimmiten prosessin keskeytymisenä tietyllä
+käyt\-tö\-jär\-jes\-tel\-mä\-koh\-tai\-sel\-la virhekoodilla.
+Unix-pohjaisissa järjestelmissä tämä tunnetaan segmentointivirheenä (Segmentation fault).
+% ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
+Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
+mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
+Kriittisimmillään muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia
+ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
+Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla muitakin lisäseurauksia.
+Esimerkiksi prosessilla ei ole mahdollisuutta siivota jotakin säilyvää tilaa,
+kuten väliaikaistiedostoja.
+Hallitsematon kuolema voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
+
+Muistivirheiksi luokitellaan tyypillisesti seuraavat:
+
+\begin{itemize}
+    \item Taulukon yli tai ali indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
+          ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
+          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu~\cite[6.5.6]{CSpec}.
+% An array subscript is out of range, even if an object is apparently accessible with the
+% given subscript (...) (6.5.6).
+          Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
+          ajonaikaisympäristön tietorakenteisiin.
+          Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
+          sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting,SplintLCLint}.
+          Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
+    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
+          C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
+          ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[7.24.1]{CSpec}.
+% If an array is accessed beyond the end of an object, the behavior is undefined.
+          Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
+          Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
+          Jo C:n standardikirjastosta löytyy funktioita joille ei ole ollenkaan mahdollista antaa tulospuskurin
+          kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting,SplintLCLint}.
+          Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
+          Puskurin ylivuodot pinossa ovatkin yleinen syy RCE-haavoittuvuuksille~\cite{SplintLCLint}.
+    \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
+          alusteta mitenkään.
+          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[6.3.2.1 ja 7.22.3.4]{CSpec},
+          mutta yleensä alustamattoman muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
+          sinne sattunut kirjoittamaan~\cite{SecurityRootOfTheProblem}.
+% An lvalue designating an object of automatic storage duration that could have been
+% declared with the register storage class is used in a context that requires the value
+% of the designated object, but the object is uninitialized. (6.3.2.1).
+%
+% The malloc function allocates space for an object whose size is specified by size and
+% whose value is indeterminate. (7.22.3.4)
+          Jos tällaista muistia sitten näytetään jossain muodossa käyttäjälle,
+          saattaa käyttäjälle vuotaa esimerkiksi ohjelman käyttämiä salausavaimia,
+          ohjelman muille käyttäjille kuuluvaa tietoa tai
+          riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden tekoa.
+          Vaihtoehtoisesti alustamattoman osoitinmuuttujan käyttö johtaa hyvin todennäköisesti uusiin muistivirheisiin
+          ja ohjelman kaatumiseen.
+
+\end{itemize}
+Edellisten lisäksi C-ohjelmoijan täytyy huoleehtia dynaamisesti varatun muistin vapauttamisesta.
+Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
+
+\begin{itemize}
+    \item Muistivuodot: Jos ohjelmoija unohtaa vapauttaa dynaamisesti varatun muistialueen
+          sen jälkeen kun sitä ei enää käytetä,
+          jää tuo muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
+          Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen~\cite{SplintLCLint},
+          mikäli lisääntynyt muistinkäyttö johtaa ohjelman sivutukseen levylle.
+      \item Muistin vapauttaminen useasti (\emph{double free}):
+          Varattua dynaamista muistialuetta ei saa vapauttaa kuin yhden kerran.
+          Muistialueen vapauttamisen jälkeen sama muistialue voidaan antaa esimerkiksi
+          ohjelman jonkun toisen moduulin muistivarauksen käyttöön.
+          Jos nyt alkuperäistä, jo vapautettua muistialuetta yritetään vapauttaa,
+          mikä näinollen aiheuttaisi jonkun toisen, täysin liittymättömän muistialueen vapauttamisen.
+          Yleensä vapautetun muistialueen vapauttaminen uudelleen aiheuttaa muistinhallintakirjaston
+          sisäisten tietorakenteiden korruptoitumisen,
+          joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
+\end{itemize}
+
+Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
+kykenevät löytämään muistivirheitä.
+Perehdytäänkin seuraavassa kappaleessa näihin testausmenetelmiin.
+
+\section{Testausmenetelmät}
+\label{Testausmenetelmat}
+
+Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite[23.1]{Sommerville}.
+Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
+sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
+testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
+Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi ikisilmukat).
+
+% \subsection{Luokittelu}
+
+Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella karkeasti
+\emph{blackbox}- ja \emph{whitebox}-testeiksi sen mukaan kuinka paljon
+testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon
+ohjelmiston sisäisen rakenteen toimintaan~\cite{OuluBrowser}.
+
+Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
+ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä~\cite{OuluBrowser}.
+Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
+tai komentoriviohjelmalle annetaan syöte normaalisti komentoriviparametrien kautta.
+Whitebox-testauskeinoissa kajotaan ohjelman sisäiseen rakenteeseen.
+Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
+Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
+tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\cite{OuluBrowser}.
+
+Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä}
+kappaleessa \ref{StaattinenAnalyysi} ja \emph{fuzzausta} kappaleessa \ref{Fuzzaus}.
+
+\section{Staattinen analyysi}
+\label{StaattinenAnalyysi}
+
+Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
+Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
+Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
+Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
+Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
+ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
+esimerkiksi Coverity~\cite{Coverity}.
+
+% \subsection{Lint}
+
+Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
+Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
+vaan yksinkertaiset ohjelmointivirheet, C-kääntäjää tarkempi tyypintarkastus sekä siirrettävyysongelmat.
+Lint osaa varoittaa esimerkiksi seuraavista virheistä:~\cite{Lint}
+
+\begin{itemize}
+    \item Alustamattoman muuttujan arvon käyttö.
+    \item Käyttämättömät muuttujat tai funktiot.
+    \item Saavuttamattomat koodirivit.
+    \item ``Järjettömät'' vertailut.
+           Esimerkiksi etumerkittömälle kokonaislukumuuttujalle \texttt{x} ei ehtolauseke
+           \texttt{if (x < 0)} ole koskaan tosi.
+   \item Yllättävä operaattoripresedenssi.
+         Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
+         mutta C:ssä \texttt{==}\,-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
+         jollon ehtolausekkeen tulokseksi tulee aina \texttt{0}.
+\end{itemize}
+
+Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
+joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle~\cite{Lint}.
+Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
+kun taas Lint tarkastelee tiedostoja kokonaisuutena,
+mikä mahdollistaa tarkemman analyysin~\cite{Lint}.
+Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä
+jo käännösaikana~\cite{SecurityRootOfTheProblem} ja uudempien ohjelmointikielten,
+esimerkiksi Javan, spesifikaatiot vaativat tällaiset tarkistukset~\cite[22.3]{Sommerville}.
+
+Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
+Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
+Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelmisto on Splint
+(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint~\cite{SplintLCLint}.
+
+Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
+mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
+Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi lausekalkyylin toteutuvuusongelmana
+(\emph{satisfiability problem})~\cite{SplintLCLint}.
+Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
+\emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
+Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
+saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
+Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
+esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
+koko annettiin parametrinä.
+Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
+puskurin turvallisen käytön edellyttämistä ehdoista ja
+puskurin todellisen koon aiheuttamista ehdoista ristiriita.
+Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
+
+\section{Fuzzaus}
+\label{Fuzzaus}
+
+\emph{Fuzzaus} on yleisesti käytetty keino automaattiseen testisyötteiden generointiin.
+Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
+että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
+Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
+% Tyhmä esimerkki, viimeistele?
+% Esimerkiksi useimmat maailmalla olevat äänitiedostot sisältävät suurella todennäköisyydellä vain kaksi äänikanavaa.
+% Luultavasti tätä yleisintä tapausta on myöskin testattu enemmän ja muut kanavamäärät ovat jääneet vähemmälle testaamiselle.
+% Fuzzeri sen sijaan saattaakin luoda äänitiedostoja, joissa on esimerkiksi 0, -89 tai 4000000 äänikanavaa.
+Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
+voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
+Liian suurista luvuista voi aiheutua aritmeettisiä ylivuotoja laskutoimituksissa.
+Esimerkiksi monissa tiedostoformaateissa täytyy lukea levyltä tietoa taulukoihin.
+Jos esimerkiksi pitää luoda taulukko 128-tavuisia merkkijonoja varten siten,
+että taulukon alkioiden lukumäärä luetaan 32-bittisestä kentästä tiedostossa,
+voi käydä huonosti muistia varatessa.
+Tiedostossa annettu taulukon koko saattaa olla niin suuri,
+että laskutoimitus \texttt{128 * koko}, eli taulukon koko tavuina,
+saattaakin ylivuotaa 32-bittisen muuttujan siten,
+että ohjelma varaakin vain $128$ tavua muistia taulukolle,
+kun oikeasti pitäisi varata $2^{32} + 128$ tavua.
+Tämä johtaa hyvin nopeasti puskurin ylivuotoon.
+
+Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
+esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
+HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
+Tämä on varsin suuri määrä koodia,
+joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäluotettavasta lähteestä, Internetistä,
+jolloin hyökkäyspinta-alaakin on runsaasti~\cite{OuluBrowser}.
+
+Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita
+aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
+\begin{itemize}
+    \item Yksinkertaisimmillaan syöte voi olla lähes pelkkää satunnaista dataa.
+          Esimerkiksi monien Unixin komentorivityökalujen syöte koostuu pelkistä tekstiriveistä
+          ilman sen kummempaa rakennetta,
+          jolloin jono rivinvaihdoilla eroteltua satunnaisgeneroituja
+          tavuja~\cite{UnixReliability} on riittävä syöte ohjelmalle.
+    \item Ennalta olemassa olevia kelvollisia syötteitä voidaan \emph{mutatoida} esimerkiksi
+          lisäämällä, poistamalla tai muokkaamalla sen osia.
+    \item Rakenteellisesti enimmäkseen kelvollisia, mutta normaalisti harvoin esiintyviä syötteitä voidaan
+          luoda esimerkiksi kontekstittoman kieliopin tai jonkun muun formaalin syötteen määrittelyn perusteella.
+    \item Ohjelman suoritusta voidaan analysoida symbolisesti, jotta voidaan
+          selvittää minkälainen vaikutus syötteellä on ohjelman tilaan~\cite{SageArtikkeli}
+          ja mahdollisesti karsia pois `hyödyttömiä' syötteitä.
+          Esimerkiksi jos voidaan päätellä, että jollekkin syötetavulle ei tehdä mitään muuta kuin
+          verrata sen yhtäsuuruutta lukuun nolla,
+          niin voidaan jättää tarkastelematta kaikki ykköstä suuremmat arvot.
+          Tällaisilla arvoillahan ohjelma käyttäytyisi tasan samalla lailla
+          kuin jos syötteenä olisi ykkönen,
+          jolloin mitään uutta informaatiota ohjelman toiminnasta ei saataisi.
+
+\end{itemize}
+
+Käsitellään seuraavaksi joitakin edellämainittuja keinoja generoida syötteitä.
+%
+% \subsection{Testitapausten generointi}
+%
+Fuzzauksen historia alkaa kirjaimellisesti synkkänä ja myrskyisenä yönä,
+jolloin sään aiheuttamat tiedonsiirtovirheet modeemiyhteydessä koituivat ongelmaksi
+eräälle alkuperäisen fuzzauspaperin kirjoittajalle.
+Tiedonsiirtovirheiden aiheuttamat satunnaiset merkit linjalle aiheutti nimittäin
+useiden Unixin peruskomentorivityökalujen kaatumisen~\cite{UnixReliability}.
+Tämän innoittamana kehitettiin \emph{fuzz}-niminen työkalu Unix-komentoriviohjelmien testaamiseen.
+
+Fuzz-ohjelma yksinkertaisesti tulosti standarditulostusvirtaansa satunnaisia tavuja,
+jotka sitten yhdistettiin Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
+Fuzzin komentoriviparametreillä pystyi hieman vaikuttamaan fuzzin generoimaan syötteeseen:
+syötteen pituuden pystyi määrittää sekä ASCII-kontrollimerkit sai kytkettyä päälle tai pois.
+Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes ollenkaan rakennetta;
+tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
+
+Testattavalle ohjelmalle annettu syöte voi ohjelmasta riippuen olla
+hyvinkin erityyppistä kuin edellä esitelty tavujonoista koostuva syöte.
+Esimerkiksi graafisen käyttöliittymän toteutus toimii usein tapahtumapohjaisesti:
+sekä Unixin X11:n, Mac OS X:n Aquan sekä Microsoft Windowsin ikkunanhallinta on toteutettu näin.
+Näihin graafisiin järjestelmiin perustuvia ohjelmia voi siten fuzzata lähettämällä
+niille esimerkiksi tekaistuja näppäimistön painalluksia tai hiiren liikkeitä vastaavia
+sanomia~\cite{X11Fuzz,MacOsFuzz,WinNtFuzz}.
+
+Esimerkki rakenteellisen syötteen generoinnista on \emph{regfuzz}-ohjelma,
+joka on kehitelty säännöllisten lausekkeiden (regular expression) moottoreiden
+fuzzaamiseen~\cite{RegFuzz}.
+Regfuzz lähtee rakentamaan säännöllistä lauseketta pala kerrallaan sisältä ulospäin:
+liikkeelle lähdetään tyhjästä merkkijonosta ja siihen lisätään joko täysin
+satunnaisia merkkejä tai valideja rakenteita,
+kuten muun muassa sulkeita, merkkijoukkoja (esimerkiksi \texttt{[\^{}a-z]}) ja
+operaattoreita (kuten \texttt{+}, \texttt{*}).
+Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke.
+
+\section{Yhteenveto}
+Tässä tutkielmassa tarkasteltiin kahta menetelmää ohjelmistojen tietoturvatestaamiseen,
+staattista analyysia ja fuzzausta.
+Huomattavaa on, että koska osa tietoturvaongelmista on seurausta ohjelmointivirheistä,
+niin tietoturvan parantamiseen soveltuu ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
+Kuitenkin fuzzaus testausmenetelmänä on toimiva menetelmä erityisesti tietoturvaongelmien löytämiseen.

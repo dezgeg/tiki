@@ -1,6 +1,6 @@
 .PHONY: all clean view
 
-TARGET=aine
+TARGET=tutkielma
 
 all:
 	latexmk $(TARGET).tex
