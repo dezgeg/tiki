@@ -35,6 +35,23 @@ kuuluu estää sovelmien pääsy tiedostojärjestelmään.
 Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
 tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
 
+Tietoturvahaavoittuvuuden vakavuuden luokitteluun on kehitelty joitakin suuntaa-antavia kvantitatiivisiä menetelmiä.
+Näistä käytetyimpiä on NIST:n kehittämä ja standardisoitu CVSS (Common Vulnerability Scoring System)~\cite{CVSS}.
+Siinä yksittäisen haavoittuvuuden vakavuus määritellään lukuna välillä 0--10,
+missä korkeampi luku tarkoittaa vakavampaa haavoittuvuutta.
+Tämä pistemäärä muodostuu kuudesta eri osa-alueesta,
+kuten kuinka monimutkaista haavoittuvuuden hyödyntäminen on ja kuinka paljon käyttöoikeuksia siihen vaaditaan.
+
+CVSS:n ohella NIST ylläpitää tietokantaa kaikista levityksessä olevien ohjelmien julkiseksi tuotuja haavoittuvuuksia.
+CVE-tietokanta on alan standardi ja julkaistuihin haavoittuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
+Tällaiset haavoittuvuustietokannat ovat mahdollistaneet haavoittuvuuksien analysoimisen ja tarkemman luokittelun.
+Tietoturvahaavoittuvuuksia luokittelemalla on todettu,
+että tietoturvaongelmiin johtavat ohjelmointivirheet ovat yhteisiä kaikille ohjelmistoille,
+riippumatta niiden toimialasta.
+Tällaiset yleispätevät haavoittuvuudet on kirjattu CWE-nimiseen tietokantaan (Common Weakness Enumeration).
+Automaattisen tietoturvatestauksen kannalta tämä on erittäin hyvä asia,
+sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä vaivalla.
+
 % \subsection{Muistiturvallisuus}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
@@ -117,6 +134,8 @@ Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
           sisäisten tietorakenteiden korruptoitumisen,
           joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
 \end{itemize}
+
+TODO: joku taulukko vaikka chromen joistain 2013 haavoittuvuuksista.
 
 Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
 kykenevät löytämään muistivirheitä.
