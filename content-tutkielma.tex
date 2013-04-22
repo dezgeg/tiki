@@ -36,14 +36,14 @@ Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpit
 tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
 
 Tietoturvahaavoittuvuuden vakavuuden luokitteluun on kehitelty joitakin suuntaa-antavia kvantitatiivisiä menetelmiä.
-Näistä käytetyimpiä on NIST:n kehittämä ja standardisoitu CVSS (Common Vulnerability Scoring System)~\cite{CVSS}.
+Näistä käytetyimpiä on NIST:n kehittämä ja standardisoitu CVSS\footnote{\url{http://nvd.nist.gov/cvss.cfm}} (Common Vulnerability Scoring System)~\cite{CVSS}.
 Siinä yksittäisen haavoittuvuuden vakavuus määritellään lukuna välillä 0--10,
 missä korkeampi luku tarkoittaa vakavampaa haavoittuvuutta.
 Tämä pistemäärä muodostuu kuudesta eri osa-alueesta,
 kuten kuinka monimutkaista haavoittuvuuden hyödyntäminen on ja kuinka paljon käyttöoikeuksia siihen vaaditaan.
 
 CVSS:n ohella NIST ylläpitää tietokantaa kaikista levityksessä olevien ohjelmien julkiseksi tuotuja haavoittuvuuksia.
-CVE-tietokanta on alan standardi ja julkaistuihin haavoittuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
+CVE-tietokanta\footnote{\url{http://cve.mitre.org}} on alan standardi ja julkaistuihin haavoittuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
 Tällaiset haavoittuvuustietokannat ovat mahdollistaneet haavoittuvuuksien analysoimisen ja tarkemman luokittelun.
 Tietoturvahaavoittuvuuksia luokittelemalla on todettu,
 että tietoturvaongelmiin johtavat ohjelmointivirheet ovat yhteisiä kaikille ohjelmistoille,
@@ -52,6 +52,21 @@ Tällaiset yleispätevät haavoittuvuudet on kirjattu CWE-nimiseen tietokantaan 
 Automaattisen tietoturvatestauksen kannalta tämä on erittäin hyvä asia,
 sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä vaivalla.
 
+\begin{table}
+\label{chromiumTaulukko}
+\begin{tabular}{l|l|l}
+    CVE-tunniste  & CVSS-pisteet    & Kuvaus (TODO: käännä) \\ \hline
+%
+    CVE-2013-0893 & 6.8 (Keskitaso) & Race condition in media handling.                       \\
+    CVE-2013-0894 & 7.5 (Korkea)    & Buffer overflow in vorbis decoding.                     \\
+    CVE-2013-0895 & 7.5 (Korkea)    & Incorrect path handling in file copying.                \\
+    CVE-2013-0896 & 7.5 (Korkea)    & Memory management issues in plug-in message handling.   \\
+    CVE-2013-0897 & 4.3 (Keskitaso) & Off-by-one read in PDF.                                 \\
+    CVE-2013-0898 & 7.5 (Korkea)    & Use-after-free in URL handling.                         \\
+    CVE-2013-0899 & 5.0 (Keskitaso) & Integer overflow in Opus handling.                      \\
+\end{tabular}
+\caption{Osa Chromium-selaimen 23.2.2013 julkistetuista haavoittuvuuksista (yhteensä 22).}
+\end{table}
 % \subsection{Muistiturvallisuus}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
@@ -135,8 +150,9 @@ Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
           joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
 \end{itemize}
 
-TODO: joku taulukko vaikka chromen joistain 2013 haavoittuvuuksista.
-
+Taulukossa \ref{chromiumTaulukko} on listattu joitakin viimeaikaisia Chromium-selaimen haavoittuvuuksia,
+joista enemmistö on muistivirheitä,
+mikä kertoo muistivirheiden yleisyydestä.
 Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
 kykenevät löytämään muistivirheitä.
 Perehdytäänkin seuraavassa kappaleessa näihin testausmenetelmiin.
