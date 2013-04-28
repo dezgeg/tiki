@@ -67,7 +67,9 @@ sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä 
 \end{tabular}
 \caption{Osa Chromium-selaimen 23.2.2013 julkistetuista haavoittuvuuksista (yhteensä 22).}
 \end{table}
-% \subsection{Muistiturvallisuus}
+
+\subsection{Muistiturvallisuus}
+\label{Muistivirheet}
 
 Ohjelmointikieli vaikuttaa ratkaisevasti siihen miten laajoja seurauksia ohjelmointivirheillä voi olla tietoturvan kannalta.
 Suurin ohjelmointikielestä riippuva tekijä on kielen \emph{muistiturvallisuus}~\cite{SoftBound},
@@ -185,7 +187,101 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\
 Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä}
 kappaleessa \ref{StaattinenAnalyysi} ja \emph{fuzzausta} kappaleessa \ref{Fuzzaus}.
 
-\section{Staattinen analyysi}
+\section{Ohjelman ajonaikainen instrumentointi}
+Luvussa \ref{Muistivirheet} tarkasteltiin muistivirheitä ja huomattiin,
+että useat muistivirheet johtuvat ajonaikaisten tarkistusten puutteesta.
+Jotta voitaisiin varmistua ohjelman olevan vapaa muistivirheistä,
+olisi testauksen ajaksi suotavaa saada tällaiset ajonaikaiset tarkistukset päälle.
+Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen instrumentointiin} perustuvia työkaluja,
+jolla käännettyyn ohjelmatiedostoon voidaan ajonaikana lisätä ylimääräisiä tarkistuksia.
+Eräs tällainen työkalu on laajasti käytetty Valgrind.
+
+\subsection{Valgrind}
+
+Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien ajonaikaiseen instrumentointiin
+perustuva työkalu, jota käytetään useimmiten muistivirheiden etsintään.
+Valgrind itsessään on laajempi kehys ajonaikaiseen instrumentointiin,
+josta muistivirheitä löytävä \emph{Memcheck}-työkalu on ylivoimaisesti käytetyin.
+
+Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumentoimana ajamalla
+\texttt{valgrind \emph{ohjelma}}.
+
+Valgrind toimii muuntamalla suorituksessa olevan natiivikonekielilohkon omalle
+arkkitehtuuririippumattomalle välikielelleen,
+ja tekee sille tarvittavia työkalukohtaisia muunnoksia.
+Memcheck-työkaluun instrumentointiin liittyy kaksi osa-aluetta:
+sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
+Jälkimmäistä varten jokaista osoiteavaruuden tavua varten on varattu nk. A-bitti (accessible),
+joka kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
+Ohjelman alussa ainoastaan itse muistissa oleva ohjelmatiedosto on merkattu käytettäväksi.
+Memcheck kaappaa kutsut C:n muistinhallintafunktioihin,
+ja joko asettaa tai poistaa A-bittejä kun keosta varataan tai vapautetaan muistia.
+Lisäksi Memcheck instrumentoi ohjelman jokaisen muistiin viittaavan konekäskyn
+ensiksi tarkistamaan osoitetta vastaavan A-bitin arvon,
+ja aiheuttaa virheen mikäli ohjelma yrittää viitata varaamattomaan muistiin.
+Näin voidaan konekäskyn tarkkuudella paikantaa missä kohtaa koodia
+muistivirhe tapahtuu.
+
+Alustamattoman muistin käytön seuranta on Memcheckille haastavampi operaatio.
+Yksinkertainen ratkaisu, jossa tulostetaan virhe aina ladattaessa
+tavu alustamattomasta muistista, ei nimittäin toimi hyvin, vaan aiheuttaa
+useita aiheettomia varoituksia.
+Tämä johtuu täytetavuista, joita C-kääntäjä saattaa joutua lisäämään struktuureiden keskelle.
+Useissa prosessoreissa esimerkiksi neljätavuisen muuttujan muistiosoitteen täytyy olla neljällä jaollinen,
+jolloin 1-tavuisen ja 4-tavuisen kentän sisältävään struktuuriin täytyy lisätä kolme täytetavua
+1-tavuisen kentän jälkeen.
+Kääntäjä ei koskaan käytä näitä tietorakenteiden täytetavuja mihinkään, eikä myöskään alusta niitä.
+Kuitenkin kokonaisia struktuureita kopioivat funktiot, kuten \texttt{memcpy},
+kopioivat nämä täytetavut muiden struktuurin kenttien mukana.
+Tämä voi tapahtua täysin korrekteissa ohjelmissa,
+joten virheilmoituksen antaminen tästä ei ole suotavaa.
+
+Memcheckin käyttämä algoritmi on huomattavasti monimutkaisempi.
+Erityisesti alustamattomia arvoja saa lukea muistista ja jopa käyttää useimmissa laskutoimituksissa ilman virheilmoitusta.
+Memcheck ei anna varoitusta laskutoimituksen määrittelemättömästä arvosta niin kauan kun voidaan nähdä,
+että alustamaton arvo ei ole \emph{havaittavasti} vaikuttanut ohjelman suoritukseen.
+Tämä on toteutettu varaamalla jokaiselle ohjelman käsittelemälle bitille dataa (sekä rekistereissä että muistissa)
+on varattu ylimääräinen V-bitti (valid),
+joka kertoo onko kyseisen bitin arvo hyvinmääritelty vai ei.
+Määrittelemättömiä arvoja syntyy `itsestään' vain kahdesta lähteestä:
+funktiokutsun yhteydessä syntyvistä paikallisista muuttujista sekä varatusta dynaamisesta muistista.
+Jälkimmäistä tapausta varten Memcheck yksinkertaisesti asettaa dynaamista muistia varattaessa uuden muistialueen kaikki V-bitit nollaksi.
+Paikallisia muuttujia varten Memcheckin täytyy instrumentoida pinosta muistia varaavat käskyt (pino-osoitinta lisäävät tai vähentävät käskyt)
+nollaamaan kyseisen alueen V-bitit.
+Lisäksi jokainen dataa käsittelevä konekäsky instrumentoidaan päivittämään samalla lopputuloksen V-bittejä tarpeen mukaan:
+esimerkiksi muistista rekisteriin lataava konekäsky asettaa myös kohderekisterin V-bitit muistista ladatun arvon V-biteistä.
+Useiden konekäskyjen kohdalla yksikin määrittelemätön bitti aiheuttaa koko lopputuloksen olevan määrittelemätön.
+Memcheck katsoo määrittelemättömien arvojen olevan ulkoisesti havaittavia kolmessa tapauksessa:
+määrittelemätön arvo annetaan parametrina käyttöjärjestelmäkutsulle,
+määrittelemätöntä arvoa käytetään muistiosoitteena,
+tai ohjelman suoritusvuo riippuu määrittelemättömästä arvosta.
+
+\begin{figure}
+\begin{verbatim}
+int main(void) {
+    int undefined;
+    int lowest_bit = undefined & 1;
+    int x = undefined + lowest_bit * 2;
+    if (lowest_bit & 1)
+      printf("Tulostetaanko tämä\n");
+    return x;
+}
+
+==17806== Conditional jump or move depends on uninitialised value(s)
+==17806==    at 0x400518: main (vg.c:5)
+==17806==
+Tulostetaanko tämä?
+==17806== Syscall param exit_group(status) contains uninitialised byte(s)
+==17806==    at 0x4EF1C18: _Exit (_exit.c:33)
+==17806==    by 0x4E6D95F: __run_exit_handlers (exit.c:93)
+==17806==    by 0x4E6D984: exit (exit.c:100)
+==17806==    by 0x4E53773: (below main) (libc-start.c:258)
+\end{verbatim}
+
+\caption{}
+\end{figure}
+
+\section{Lähdekoodin staattinen analyysi}
 \label{StaattinenAnalyysi}
 
 Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
