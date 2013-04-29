@@ -1,0 +1,11 @@
+$ gcc -o example valgrind_example.c
+$ valgrind ./example
+==17806== Conditional jump or move depends on uninitialised value(s)
+==17806==    at 0x400518: main (valgrind_example.c:5)
+==17806==
+Tulostetaanko tämä?
+==17806== Syscall param exit_group(status) contains uninitialised byte(s)
+==17806==    at 0x4EF1C18: _Exit (_exit.c:33)
+==17806==    by 0x4E6D95F: __run_exit_handlers (exit.c:93)
+==17806==    by 0x4E6D984: exit (exit.c:100)
+==17806==    by 0x4E53773: (below main) (libc-start.c:258)

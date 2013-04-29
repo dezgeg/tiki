@@ -257,28 +257,10 @@ määrittelemätöntä arvoa käytetään muistiosoitteena,
 tai ohjelman suoritusvuo riippuu määrittelemättömästä arvosta.
 
 \begin{figure}
-\begin{verbatim}
-int main(void) {
-    int undefined;
-    int lowest_bit = undefined & 1;
-    int x = undefined + lowest_bit * 2;
-    if (lowest_bit & 1)
-      printf("Tulostetaanko tämä\n");
-    return x;
-}
+\lstinputlisting[language=C,numbers=left]{include/valgrindExample.c}
+\lstinputlisting{include/valgrindOutput.txt}
 
-==17806== Conditional jump or move depends on uninitialised value(s)
-==17806==    at 0x400518: main (vg.c:5)
-==17806==
-Tulostetaanko tämä?
-==17806== Syscall param exit_group(status) contains uninitialised byte(s)
-==17806==    at 0x4EF1C18: _Exit (_exit.c:33)
-==17806==    by 0x4E6D95F: __run_exit_handlers (exit.c:93)
-==17806==    by 0x4E6D984: exit (exit.c:100)
-==17806==    by 0x4E53773: (below main) (libc-start.c:258)
-\end{verbatim}
-
-\caption{}
+\caption{Esimerkki Valgrind-ohjelman käytöstä.}
 \end{figure}
 
 \section{Lähdekoodin staattinen analyysi}

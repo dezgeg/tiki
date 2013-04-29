@@ -7,8 +7,14 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{microtype}
-\usepackage{amsfonts,amsmath,amssymb,amsthm,booktabs,color,enumitem,graphicx,chngpage}
+\usepackage{amsfonts,amsmath,amssymb,amsthm,booktabs,color,enumitem,graphicx,listings}
 \usepackage[pdftex,hidelinks]{hyperref}
+
+% Fuck you latex.
+\lstset{
+  literate={ö}{{\"o}}1
+           {ä}{{\"a}}1
+}
 
 % Automatically set the PDF metadata fields
 \makeatletter
