@@ -371,7 +371,7 @@ aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
     \item Ohjelman suoritusta voidaan analysoida symbolisesti, jotta voidaan
           selvittää minkälainen vaikutus syötteellä on ohjelman tilaan~\cite{SageArtikkeli}
           ja mahdollisesti karsia pois `hyödyttömiä' syötteitä.
-          Esimerkiksi jos voidaan päätellä, että jollekkin syötetavulle ei tehdä mitään muuta kuin
+          Esimerkiksi jos voidaan päätellä, että jollekin syötetavulle ei tehdä mitään muuta kuin
           verrata sen yhtäsuuruutta lukuun nolla,
           niin voidaan jättää tarkastelematta kaikki ykköstä suuremmat arvot.
           Tällaisilla arvoillahan ohjelma käyttäytyisi tasan samalla lailla
@@ -391,10 +391,10 @@ Tiedonsiirtovirheiden aiheuttamat satunnaiset merkit linjalle aiheutti nimittäi
 useiden Unixin peruskomentorivityökalujen kaatumisen~\cite{UnixReliability}.
 Tämän innoittamana kehitettiin \emph{fuzz}-niminen työkalu Unix-komentoriviohjelmien testaamiseen.
 
-Fuzz-ohjelma yksinkertaisesti tulosti standarditulostusvirtaansa satunnaisia tavuja,
-jotka sitten yhdistettiin Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
-Fuzzin komentoriviparametreillä pystyi hieman vaikuttamaan fuzzin generoimaan syötteeseen:
-syötteen pituuden pystyi määrittää sekä ASCII-kontrollimerkit sai kytkettyä päälle tai pois.
+Fuzz-ohjelma yksinkertaisesti tulostaa standarditulostusvirtaansa satunnaisia tavuja,
+jotka yhdistetään Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
+Fuzzin komentoriviparametreillä voi jossain määrin vaikuttaa fuzzin generoimaan syötteeseen:
+syötteen pituus on määriteltävissä sekä ASCII-kontrollimerkit saa kytkettyä päälle tai pois.
 Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes ollenkaan rakennetta;
 tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
 
@@ -407,18 +407,24 @@ niille esimerkiksi tekaistuja näppäimistön painalluksia tai hiiren liikkeitä
 sanomia~\cite{X11Fuzz,MacOsFuzz,WinNtFuzz}.
 
 Esimerkki rakenteellisen syötteen generoinnista on \emph{regfuzz}-ohjelma,
-joka on kehitelty säännöllisten lausekkeiden (regular expression) moottoreiden
+joka on kehitelty säännöllisiä lausekkeiden (regular expression) kirjastojen
 fuzzaamiseen~\cite{RegFuzz}.
 Regfuzz lähtee rakentamaan säännöllistä lauseketta pala kerrallaan sisältä ulospäin:
 liikkeelle lähdetään tyhjästä merkkijonosta ja siihen lisätään joko täysin
 satunnaisia merkkejä tai valideja rakenteita,
 kuten muun muassa sulkeita, merkkijoukkoja (esimerkiksi \texttt{[\^{}a-z]}) ja
 operaattoreita (kuten \texttt{+}, \texttt{*}).
-Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke.
+Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke,
+joka voidaan antaa syötteeksi testattavalle säännöllisten lausekkeiden toteutukselle.
+Esimerkiksi regfuzzia testattiin alun perin pääosin PCRE-kirjastolle,
+joka on käytössä muun muassa useiden selainten Javascript-toteutuksissa sekä Adobe Flashissa.
+Regfuzz paljasti PCRE-kirjastosta mahdollisia palvelunestohyökkäyksiä liittyen
+virheellisten Unicode-merkkien käsittelyyn sekä tietyntyyppisten validienkin
+säännöllisten lausekkeiden aiheuttamaan suureen muistinkulutukseen.
 
 \section{Yhteenveto}
 Tässä tutkielmassa tarkasteltiin kahta menetelmää ohjelmistojen tietoturvatestaamiseen,
 staattista analyysia ja fuzzausta.
 Huomattavaa on, että koska osa tietoturvaongelmista on seurausta ohjelmointivirheistä,
-niin tietoturvan parantamiseen soveltuu ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
+niin tietoturvan parantamiseen soveltuvat ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
 Kuitenkin fuzzaus testausmenetelmänä on toimiva menetelmä erityisesti tietoturvaongelmien löytämiseen.
