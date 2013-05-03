@@ -16,12 +16,17 @@ disassembler-ohjelmalla symboliselle konekielelle
 ja tutkia ohjelmaa konekielitasolla.
 Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
 
-Tarkastellaan aluksi kappaleessa \ref{YleinenTietoturva} C-kielisissä ohjelmissa yleisiä tietoturvaongelmia,
-muistivirheitä, sekä kappaleesta \ref{Testausmenetelmat} eteenpäin yleisiä tietoturvatestaamisen menetelmiä.
+Tarkastelen tässä tutkielmassa erityisesti C- ja C++-kielisten ohjelmien tyypillisiä tietoturvahaavoittuvuuksia
+ja automaattisia menetelmiä niiden löytämiseen.
+Kappaleessa \ref{YleinenTietoturva} käsittelen tietoturvaongelmia sekä yleisellä tasolla
+että erityisesti C-kielisiä ohjelmia vaivaaviin muistivirheisiin.
+Kappaleessa \ref{Testausmenetelmat} kerron yleisesti tietoturvatestaamisen menetelmistä
+sekä kappaleissa \ref{StaattinenAnalyysi}, \ref{DynaaminenInstrumentointi} ja \ref{Fuzzaus}
+tarkemmin kolmesta menetelmästä: staattisesta analyysista, dynaamisesta instrumentoinnista sekä fuzzauksesta.
 
-\section{Muistiturvallisuus}
+\section{Tietoturvahaavoittuvuudet}
 \label{YleinenTietoturva}
-
+\subsection{Yleisesti}
 Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
 (trust boundary) ylitys~\cite{ViolatingAssumptions}.
 Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii käyttäjältä pääsyä
@@ -85,17 +90,19 @@ Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
 mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
 Kriittisimmillään muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia
 ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
-Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla muitakin lisäseurauksia.
-Esimerkiksi prosessilla ei ole mahdollisuutta siivota jotakin säilyvää tilaa,
-kuten väliaikaistiedostoja.
+Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla lisäseurauksia.
+Esimerkiksi prosessilla ei ole yleensä mahdollisuutta siivota väliaikais- tai lukkotiedostoja,
+jotka voivat jäädä viemään levytilaa tai estämään ohjelman käynnistämisen,
+mikäli ohjelma käyttää lukkotiedostoa estämään useamman ohjelmainstanssin käynnistämisen.
 Hallitsematon kuolema voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
 
-Muistivirheiksi luokitellaan tyypillisesti seuraavat:
+Muistivirheiksi luokitellaan tyypillisesti muun muassa
+taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin käyttö:
 
 \begin{itemize}
     \item Taulukon yli tai ali indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
           ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
-          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu~\cite[kohta 6.5.6]{CSpec}.
+          Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu~\cite[\S 6.5.6]{CSpec}.
 % An array subscript is out of range, even if an object is apparently accessible with the
 % given subscript (...) (6.5.6).
           Käytännössä usein tapahtuu joko muistiviittaus taulukkoa ympäröiviin muuttujiin tai
@@ -105,7 +112,7 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
     \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
-          ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[kohta 7.24.1]{CSpec}.
+          ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[\S 7.24.1]{CSpec}.
 % If an array is accessed beyond the end of an object, the behavior is undefined.
           Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
           Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
@@ -113,9 +120,9 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting,SplintLCLint}.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
           Puskurin ylivuodot pinossa ovatkin yleinen syy RCE-haavoittuvuuksille~\cite{SplintLCLint}.
-    \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille varattua muistia
-          alusteta mitenkään.
-          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[kohdat 6.3.2.1 ja 7.22.3.4]{CSpec},
+    \item Alustamattoman muistin käyttö: C:ssä keosta tai paikallisille muuttujille
+          varattua muistia ei alusteta mitenkään.
+          Kielen spesifikaatio ei määrittele mitä alustamattoman muistin käytöstä seuraa~\cite[\S 6.3.2.1, \S 7.22.3.4]{CSpec},
           mutta yleensä alustamattoman muistialueen sisältönä on jotain mitä kyseisen muistialueen aiempi käyttäjä on
           sinne sattunut kirjoittamaan~\cite{SecurityRootOfTheProblem}.
 % An lvalue designating an object of automatic storage duration that could have been
@@ -127,21 +134,22 @@ Muistivirheiksi luokitellaan tyypillisesti seuraavat:
           Jos tällaista muistia sitten näytetään jossain muodossa käyttäjälle,
           saattaa käyttäjälle vuotaa esimerkiksi ohjelman käyttämiä salausavaimia,
           ohjelman muille käyttäjille kuuluvaa tietoa tai
-          riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden tekoa.
+          riittävästi tietoa ohjelman käyttämistä muistialueista helpottamaan RCE-haavoittuvuuden hyödyntämistä.
           Vaihtoehtoisesti alustamattoman osoitinmuuttujan käyttö johtaa hyvin todennäköisesti uusiin muistivirheisiin
           ja ohjelman kaatumiseen.
 
 \end{itemize}
 Edellisten lisäksi C-ohjelmoijan täytyy huoleehtia dynaamisesti varatun muistin vapauttamisesta.
-Tästä aiheutuu vielä lisää mahdollisia virhetilanteita:
+Tästä aiheutuu vielä lisää mahdollisia virhetilanteita,
+kuten muistivuotoja tai dynaamisen muistin vapauttamista kahdesti:
 
 \begin{itemize}
     \item Muistivuodot: Jos ohjelmoija unohtaa vapauttaa dynaamisesti varatun muistialueen
           sen jälkeen kun sitä ei enää käytetä,
-          jää tuo muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
+          jää kyseinen muistivaraus kuluttamaan muistia ohjelman sulkemiseen asti.
           Tämä mahdollistaa esimerkiksi palvelunestohyökkäyksen~\cite{SplintLCLint},
           mikäli lisääntynyt muistinkäyttö johtaa ohjelman sivutukseen levylle.
-      \item Muistin vapauttaminen useasti (\emph{double free}):
+      \item Muistin vapauttaminen moneen kertaan (\emph{double free}):
           Varattua dynaamista muistialuetta ei saa vapauttaa kuin yhden kerran.
           Muistialueen vapauttamisen jälkeen sama muistialue voidaan antaa esimerkiksi
           ohjelman jonkun toisen moduulin muistivarauksen käyttöön.
@@ -157,7 +165,7 @@ joista enemmistö on muistivirheitä,
 mikä kertoo muistivirheiden yleisyydestä.
 Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
 kykenevät löytämään muistivirheitä.
-Perehdytäänkin seuraavassa kappaleessa näihin testausmenetelmiin.
+Tarkastellaan seuraavassa kappaleessa tietoturvatestaamisen menetelmiä.
 
 \section{Testausmenetelmät}
 \label{Testausmenetelmat}
@@ -184,8 +192,8 @@ Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
 tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\cite{OuluBrowser}.
 
-Tarkastellaan seuraavaksi muutamaa automaattista testausmenetelmää: \emph{staattista analyysiä}
-kappaleessa \ref{StaattinenAnalyysi} ja \emph{fuzzausta} kappaleessa \ref{Fuzzaus}.
+Tarkastellaan seuraavaksi kahta automaattista testausmenetelmää: staattista analyysiä
+kappaleessa \ref{StaattinenAnalyysi} ja fuzzausta kappaleessa \ref{Fuzzaus}.
 
 \section{Ohjelman ajonaikainen instrumentointi}
 Luvussa \ref{Muistivirheet} tarkasteltiin muistivirheitä ja huomattiin,
@@ -266,8 +274,8 @@ tai ohjelman suoritusvuo riippuu määrittelemättömästä arvosta.
 \section{Lähdekoodin staattinen analyysi}
 \label{StaattinenAnalyysi}
 
-Staattiseen analyysiin perustuvat keinot ovat lähdekoodin analyysiä tekeviä whitebox-menetelmiä.
-Tällaiset menetelmät yrittävät paikantaa lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
+Staattinen analyysi on whitebox-menetelmä jossa yritetään paikantaa ohjelman
+lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
 Monista tällaisista ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
 Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
 Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
