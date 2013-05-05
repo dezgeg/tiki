@@ -477,8 +477,25 @@ virheellisten Unicode-merkkien käsittelyyn sekä tietyntyyppisten validienkin
 säännöllisten lausekkeiden aiheuttamaan suureen muistinkulutukseen.
 
 \section{Yhteenveto}
-Tässä tutkielmassa tarkasteltiin kahta menetelmää ohjelmistojen tietoturvatestaamiseen,
-staattista analyysia ja fuzzausta.
+Tässä tutkielmassa tarkasteltiin kolmea automaattista menetelmää ohjelmistojen tietoturvatestaamiseen:
+staattista analyysia, ajonaikaista instrumentointia ja fuzzausta.
+Näitä menetelmiä keskityttiin tutkimaan pääosin C-kielisten ohjelmien muistivirheiden kannalta.
+Huomattavaa on, että vaikka nämä kolme menetelmää kykenevät havaitsemaan samantyyppisiä virheitä,
+eivät ne ole toisiaan poissulkevia vaan toisiaan täydentäviä:
+\begin{itemize}
+    \item Lähdekoodin staattiseen analyysiin perustuvat menetelmät vaativat pääsyn
+          testattavan ohjelmiston lähdekoodiin.
+    \item Dynaamiseen instrumentointiin perustuvat menetelmät kykenevät paikantamaan virheitä
+          vain itse testauksen aikana suoritetuista koodipoluista.
+          Staattisen analyysin menetelmät pystyvät paikantamaan sellaisiakin virheitä,
+          joihin törmääminen on teoriassa mahdollista, mutta käytännössä hyvin epätodennäköistä.
+          Fuzzaus löytää harvemmin suoritetuista koodipoluista virheitä satunnaisuuden ja todennäköisyyden mukaan.
+    \item Dynaamiseen instrumentointiin sekä staattiseen analyysiin soveltuvat hyvin valmiina saatavilla olevat työkalut.
+          Fuzzausta varten voi joutua toteuttamaan itse toivotunlaista syötettä generoivan fuzzerin.
+    \item Yksinkertainen fuzz-testi yrittää löytää syötteitä, jotka vain kaatavat testattavan ohjelman.
+          Yhdistämällä fuzzaukseen dynaamisen instrumentoinnin menetelmiä voidaan tiukentaa
+          tiukentaa fuzzauksen kriteereitä ja etsiä myös muistivirheitä aiheuttavia syötteitä.
+\end{itemize}
 Huomattavaa on, että koska osa tietoturvaongelmista on seurausta ohjelmointivirheistä,
 niin tietoturvan parantamiseen soveltuvat ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
 Kuitenkin fuzzaus testausmenetelmänä on toimiva menetelmä erityisesti tietoturvaongelmien löytämiseen.
