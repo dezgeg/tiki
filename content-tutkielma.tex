@@ -76,7 +76,7 @@ Unix-pohjaisissa järjestelmissä tämä tunnetaan segmentointivirheenä (Segmen
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
 mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
 Kriittisimmillään muistivirheet voivat sallia hyökkääjän suorittaa mielivaltaista koodia
-ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
+ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution). \fixme[selitä ehkä lisää]
 Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla lisäseurauksia.
 Esimerkiksi prosessilla ei ole yleensä mahdollisuutta siivota väliaikais- tai lukkotiedostoja,
 jotka voivat jäädä viemään levytilaa tai estämään ohjelman käyn\-nis\-tä\-mi\-sen,
@@ -230,7 +230,8 @@ Lint osaa varoittaa esimerkiksi seuraavista virheistä~\cite{Lint}:
          jolloin ehtolausekkeen tulokseksi tulee aina \texttt{0}.
 \end{itemize}
 
-Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
+Lint-ohjelman kirjoittamisen aikaan 70-luvulla C-kääntäjissä kääntämisen nopeus oli
+korkeammalla prioriteetilla kuin käännösaikaisten ylimääräisten varoituksien antaminen,
 joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle~\cite{Lint}.
 Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
 kun taas Lint tarkastelee tiedostoja kokonaisuutena,
@@ -365,6 +366,7 @@ Ennen vai jälkeen kuvaa?
 Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
 Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
+\fixme[aika tönkköä]
 % Tyhmä esimerkki, viimeistele?
 % Esimerkiksi useimmat maailmalla olevat äänitiedostot sisältävät suurella todennäköisyydellä vain kaksi äänikanavaa.
 % Luultavasti tätä yleisintä tapausta on myöskin testattu enemmän ja muut kanavamäärät ovat jääneet vähemmälle testaamiselle.
@@ -372,23 +374,21 @@ Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
 Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
 voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
 Liian suurista luvuista voi aiheutua aritmeettisia ylivuotoja laskutoimituksissa.
-Esimerkiksi monissa tiedostoformaateissa täytyy lukea levyltä tietoa taulukoihin.
-Jos esimerkiksi pitää luoda taulukko 128-tavuisia merkkijonoja varten siten,
-että taulukon alkioiden lukumäärä luetaan 32-bittisestä kentästä tiedostossa,
-voi käydä huonosti muistia varatessa.
+Esimerkiksi jos ohjelman täytyy lukea tiedostosta taulukkoon 128-tavuisia struktuureita
+ja struktuurien lukumäärä on ilmoitettu tiedostossa 32-bittisessä kentässä,
+on kokonaisluvun ylivuoto mahdollinen varattaessa muistia taulukolle.
 Tiedostossa annettu taulukon koko saattaa olla niin suuri,
-että laskutoimitus \texttt{128 * koko}, eli taulukon koko tavuina,
-saattaakin ylivuotaa 32-bittisen muuttujan siten,
-että ohjelma varaakin vain $128$ tavua muistia taulukolle,
-kun oikeasti pitäisi varata $2^{32} + 128$ tavua.
-Tämä johtaa hyvin nopeasti puskurin ylivuotoon.
+että laskettaessa taulukon kokoa tavuina laskutoimituksella \texttt{128 * koko}
+lopputulos on niin suuri ettei se mahdu 32-bittiseen muuttujaan.
+Tämän seurauksena ohjelma voi varata taulukolle liian vähän muistia
+ja johtaa puskurin ylivuotoon.
 
 Fuzzaukselle hyvin sopivia kohteita ovat muun muassa erinäisten tiedostoformaattien jäsentäjät~\cite{SageArtikkeli,OuluBrowser}:
 esimerkiksi web-selaimet joutuvat käsittelemään muun muassa
 HTML-, CSS-, PNG- ja JavaScript-muotoisia tiedostoja~\cite{OuluBrowser}.
-Tämä on varsin suuri määrä koodia,
-joka joutuu käsittelemään syötteenään tiedostoja suoraan lähtökohtaisesti epäluotettavasta lähteestä, Internetistä,
-jolloin hyökkäyspinta-alaakin on runsaasti~\cite{OuluBrowser}.
+Tiedostoformaattien käsittelyyn tarvitaan suuri määrä koodia,
+joka on välittömissä tekemisissä lähtökohtaisesti epäluotettavista lähteistä, kuten Internetistä peräisin olevien tiedostojen kanssa.
+Tästä seuraa, että hyökkäyspinta-alaa on runsaasti~\cite{OuluBrowser}.
 
 Fuzzaukseen sopivien syötteiden luontiin on olemassa runsaasti tekniikoita
 aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
@@ -416,22 +416,18 @@ aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
 
 \fixme[wut?]
 Kä\-si\-tel\-lään seuraavaksi joitakin e\-del\-lä\-mai\-nit\-tu\-ja keinoja generoida syötteitä.
-%
-% \subsection{Testitapausten generointi}
-%
 Fuzzauksen historia alkaa kirjaimellisesti synkkänä ja myrskyisenä yönä,
 jolloin sään aiheuttamat tiedonsiirtovirheet modeemiyhteydessä koituivat ongelmaksi
-eräälle alkuperäisen fuzzauspaperin kirjoittajalle.
-\fixme
-Tiedonsiirtovirheiden aiheuttamat satunnaiset merkit linjalle aiheutti nimittäin
-useiden Unixin peruskomentorivityökalujen kaatumisen~\cite{UnixReliability}.
-Tämän innoittamana kehitettiin \emph{fuzz}-niminen työkalu Unix-komentoriviohjelmien testaamiseen.
+eräälle alkuperäisen fuzzausta käsittelevän artikkelin kirjoittajalle\cite{UnixReliability}.
+Tiedonsiirtovirheistä syntyvät satunnaiset roskamerkit aiheuttivat nimittäin
+useiden Unixin peruskomentorivityökalujen kaatumisen,
+jonka innoittamana Miller et al. kehittelivät \emph{fuzz}-nimisen työkalun Unix-komentoriviohjelmien testaamiseen~\cite{UnixReliability}.
 
 Fuzz-ohjelma yksinkertaisesti tulostaa standarditulostusvirtaansa satunnaisia tavuja,
 jotka yhdistetään Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
 Fuzzin komentoriviparametreilla voi jossain määrin vaikuttaa fuzzin generoimaan syötteeseen:
 syötteen pituus on määriteltävissä sekä ASCII-kontrollimerkit saa kytkettyä päälle tai pois.
-Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes ollenkaan rakennetta;
+Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes lainkaan rakennetta;
 tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
 
 Testattavalle ohjelmalle annettu syöte voi ohjelmasta riippuen olla
