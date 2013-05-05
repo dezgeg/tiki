@@ -22,9 +22,8 @@ ja automaattisia menetelmiä niiden löytämiseen.
 Kappaleessa \ref{YleinenTietoturva} käsittelen tietoturvaongelmia sekä yleisellä tasolla
 että erityisesti C-kielisiä ohjelmia vaivaaviin muistivirheisiin.
 Kappaleessa \ref{Testausmenetelmat} kerron yleisesti tietoturvatestaamisen menetelmistä
-sekä kappaleissa \ref{StaattinenAnalyysi}, \ref{DynaaminenInstrumentointi} ja \ref{Fuzzaus}
+sekä kappaleissa \ref{StaattinenAnalyysi}--\ref{Fuzzaus}
 tarkemmin kolmesta menetelmästä: staattisesta analyysista, dynaamisesta instrumentoinnista sekä fuzzauksesta.
-\fixme[kappalejärjestys?]
 
 \section{Tietoturvahaavoittuvuudet}
 \label{YleinenTietoturva}
@@ -202,6 +201,8 @@ kappaleessa \ref{StaattinenAnalyysi} ja fuzzausta kappaleessa \ref{Fuzzaus}.
 \section{Lähdekoodin staattinen analyysi}
 \label{StaattinenAnalyysi}
 
+\subsection{Yleisesti}
+
 Staattinen analyysi on whitebox-menetelmä jossa yritetään paikantaa ohjelman
 lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
 Monista täl\-lai\-sis\-ta ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
@@ -210,7 +211,7 @@ Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintä
 ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
 esimerkiksi Coverity~\cite{Coverity}.
 
-% \subsection{Lint}
+\subsection{Lint}
 
 Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
 Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
@@ -254,13 +255,19 @@ Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti
 Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
 saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
 Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
-esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
-koko annettiin parametrina.
+esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri,
+jonka koko annettiin parametrina.
 Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
 puskurin turvallisen käytön edellyttämistä ehdoista ja
 puskurin todellisen koon aiheuttamista ehdoista ristiriita.
 Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
-\fixme[Viimeistele luku]
+
+\subsection{Yhteenveto}
+Yksinkertaiset lähdekoodin staattiseen analyysiin perustuvia menetelmät ovat laajasti käytössä monien kääntäjien tarjoamien varoitusten muodossa,
+joskin painottuneena enemmän ohjelmointivirheisiin yleisesti kuin tietoturva-aiheisiin virheisiin.
+Monimutkaisemmissa tilanteissa virheellisten varoitusten määrä kasvaa \fixme[joku lähde].
+Haavoittuvuustestaamisen kannalta staattisen analyysin haittapuolena on vaatimus päästä käsiksi testattavan ohjelmiston lähdekoodiin,
+mikä ei usein kaupallisten ohjelmistojen tapauksessa ole mahdollista muille kuin ohjelmiston kehittäneelle taholle.
 
 \section{Ohjelman ajonaikainen instrumentointi}
 \label{DynaaminenInstrumentointi}
@@ -268,24 +275,27 @@ Luvussa \ref{Muistivirheet} tarkasteltiin muistivirheitä ja huomattiin,
 että useat muistivirheet johtuvat ajonaikaisten tarkistusten puutteesta.
 Jotta voitaisiin varmistua ohjelman olevan vapaa muistivirheistä,
 olisi testauksen ajaksi suotavaa saada tällaiset ajonaikaiset tarkistukset päälle.
-Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen instrumentointiin} perustuvia työkaluja,
+Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen (tai dynaamiseen) instrumentointiin} perustuvia työkaluja,
 jolla käännettyyn ohjelmatiedostoon voidaan ajonaikana lisätä ylimääräisiä tarkistuksia.
 Eräs tällainen työkalu on laajasti käytetty Valgrind.
 
 \subsection{Valgrind}
 
-Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien ajonaikaiseen instrumentointiin
+Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien dynaamiseen instrumentointiin
 perustuva työkalu\fixme[toistoa aika rankasti], jota käytetään useimmiten muistivirheiden etsintään~\cite{Valgrind}.
-Valgrind itsessään on laajempi kehys ajonaikaiseen instrumentointiin,
+Valgrind itsessään on laajempi kehys dynaamiseen instrumentointiin,
 josta muistivirheitä löytävä \emph{Memcheck}-työkalu on ylivoimaisesti käytetyin.
 Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumentoimana ajamalla
 \texttt{valgrind \emph{ohjelma}}.
 
-Valgrind toimii muuntamalla suorituksessa olevan natiivikonekielilohkon\fixme omalle
-arkkitehtuuririippumattomalle välikielelleen,
-ja tekee sille tarvittavia työkalukohtaisia muunnoksia.
+Valgrindin toimintaperiaate muistuttaa läheisesti monia virtuaalikoneita ja prosessoriemulaattoreita.
+Instrumentoitavaa konekielistä ohjelmaa ei siis ajetakaan suoraan prosessorilla kuten tavallisesti,
+vaan se ensin käännetään lennossa Valgrindin sisäiselle alustariippumattomalle välikielelle.
+Tälle välikieliselle ohjelmalle työkalut (kuten Memcheck) voivat tehdä tarvittavia muunnoksia,
+jonka jälkeen muunnettu välikielinen ohjelma JIT-käännetään natiiville konekielelle.
 Memcheck-työkalun instrumentointiin liittyy kaksi osa-aluetta:
 sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
+
 Jälkimmäistä varten jokaista osoiteavaruuden tavua varten on varattu nk. A-bitti (accessible),
 joka kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
 Ohjelman alussa ainoastaan itse muistissa oleva ohjelmatiedosto on merkattu käytettäväksi.
@@ -356,8 +366,20 @@ ja Memcheck antaa virheen. \fixme[Aika kuraa.]
 \label{ValgrindEsimerkki}
 \end{figure}
 
-\fixme[Viimeistele luku]Vertaa staattiseen analyysiin hieman, johdattele fuzzaukseen.
-Ennen vai jälkeen kuvaa?
+Valgrindin käyttö on varsin helppoa:
+testattava ohjelma käynnistetään instrumentointityökalun ajamana ja ohjelmaa voi käyttää aivan normaalisti,
+joskin suoritus on huomattavasti hitaampaa.
+Haavoittuvuustestauksen kannalta Valgrindilla on selkeä etu staattiseen analyysiin verrattuna sillä
+Valgrindin käyttö ei edellytä pääsyä testattavan ohjelmiston lähdekoodiin,
+joten myös muut kun ohjelmiston kehittäjät voivat käyttää Valgrindia suljetun lähdekoodin ohjelmiston haavoittuvuustestaukseen.
+Toisaalta taas dynaamiseen instrumentointiin perustuvat työkalut eivät kykene löytämään virheitä
+sellaisesta koodista, mitä ei ole ajettu instrumentoinnin aikana.
+Jos siis ohjelman Valgrind-ajon aikana suoritetaan vaikkapa vain 60\%,
+ei tuosta ylijääneestä 40\%:sta Valgrind kykene löytämään yhtäkään virhettä
+ellei suoritettavan koodin osuutta saada kasvatettua.
+Tähän toimii seuraavassa kappaleessa esiteltävä \emph{fuzzaus},
+joka on jo itsessään toimiva menetelmä haavoittuvuustestaukseen,
+mutta auttaa myös kasvattamaan testaamisen aikana suoritetun koodin osuutta.
 
 \section{Fuzzaus}
 \label{Fuzzaus}
