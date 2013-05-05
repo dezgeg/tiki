@@ -1,7 +1,7 @@
 \section{Johdanto}
 
 Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä:
-Tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
+tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
 sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
 Esimerkiksi Microsoftin IIS-palvelimen haavoittuvuuden avulla levinneestä Code Red-madosta
@@ -14,7 +14,7 @@ tai avoimen lähdekoodin ohjelmille.
 Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
 disassembler-ohjelmalla symboliselle konekielelle
 ja tutkia ohjelmaa konekielitasolla.
-Kummassakin tapauksessa manuaalinen tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
+Kummassakin tapauksessa ihmisvoimin tapahtuva tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
 
 Tarkastelen tässä tutkielmassa erityisesti C- ja C++-kielisten ohjelmien tyypillisiä tietoturvahaavoittuvuuksia
 ja automaattisia menetelmiä niiden löytämiseen.
@@ -31,11 +31,11 @@ Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \e
 (trust boundary) ylitys~\cite{ViolatingAssumptions}.
 Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii käyttäjältä pääsyä
 ylläpitäjän hallintavalikkoon, ei kyseisellä virheellä ole suhteellisesti kovin suurta tietoturvamerkitystä.
-Jos käyttäjällä kerran on ylläpitäjän oikeudet, niin samaan lopputulokseenhan päädytään mikäli kyseinen
+Jos käyttäjällä kerran on ylläpitäjän oikeudet, niin samaan lopputulokseen päädytään mikäli kyseinen
 käyttäjä yksinkertaisesti sammuttaa palvelimen tavallisia keinoja käyttäen.
-Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsee lukemaan käyttäjän tiedostoja,
+Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsevät lukemaan käyttäjän tiedostoja,
 on tilanne vakavampi,
-koska web-sivujen katselemisen tarkoitus on olla turvallista ja selaimen siten
+koska web-sivujen katselemisen on tarkoitus olla turvallista ja selaimen siten
 kuuluu estää sovelmien pääsy tiedostojärjestelmään.
 Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
 tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
@@ -47,7 +47,7 @@ missä korkeampi luku tarkoittaa vakavampaa haavoittuvuutta.
 Tämä pistemäärä muodostuu kuudesta eri osa-alueesta,
 kuten kuinka monimutkaista haavoittuvuuden hyödyntäminen on ja kuinka paljon käyttöoikeuksia siihen vaaditaan.
 
-CVSS:n ohella NIST ylläpitää tietokantaa kaikista levityksessä olevien ohjelmien julkiseksi tuotuja haavoittuvuuksia.
+CVSS:n ohella NIST ylläpitää tietokantaa kaikista levityksessä olevien ohjelmien julkiseksi tuoduista haavoittuvuuksista.
 CVE-tietokanta\footnote{\url{http://cve.mitre.org}} on alan standardi ja julkaistuihin haavoittuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
 Tällaiset haavoittuvuustietokannat ovat mahdollistaneet haavoittuvuuksien analysoimisen ja tarkemman luokittelun.
 Tietoturvahaavoittuvuuksia luokittelemalla on todettu,
@@ -58,7 +58,6 @@ Automaattisen tietoturvatestauksen kannalta tämä on erittäin hyvä asia,
 sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä vaivalla.
 
 \begin{table}
-\label{chromiumTaulukko}
 \begin{tabular}{l|l|l}
     CVE-tunniste  & CVSS-pisteet    & Kuvaus (TODO: käännä) \\ \hline
 %
@@ -71,6 +70,7 @@ sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä 
     CVE-2013-0899 & 5.0 (Keskitaso) & Integer overflow in Opus handling.                      \\
 \end{tabular}
 \caption{Osa Chromium-selaimen 23.2.2013 julkistetuista haavoittuvuuksista (yhteensä 22).}
+\label{chromiumTaulukko}
 \end{table}
 
 \subsection{Muistiturvallisuus}
@@ -88,13 +88,13 @@ Unix-pohjaisissa järjestelmissä tämä tunnetaan segmentointivirheenä (Segmen
 % ja Windows-järjestelmissä STATUS\_ACCESS\_VIOLATION.
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
 mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
-Kriittisimmillään muistivirheet voivat mahdollistaa hyökkääjän suorittaa mielivaltaista koodia
+Kriittisimmillään muistivirheet voivat sallia hyökkääjän suorittaa mielivaltaista koodia
 ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
 Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla lisäseurauksia.
 Esimerkiksi prosessilla ei ole yleensä mahdollisuutta siivota väliaikais- tai lukkotiedostoja,
 jotka voivat jäädä viemään levytilaa tai estämään ohjelman käyn\-nis\-tä\-mi\-sen,
-mikäli ohjelma käyttää lukkotiedostoa es\-tä\-mään useamman ohjelmainstanssin käyn\-nis\-tä\-mi\-sen.
-Hallitsematon kuolema voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
+mikäli ohjelma käyttää lukkotiedostoa es\-tä\-mään useamman ohjelmainstanssin ajamisen yhtäaikaa.
+Hallitsematon sulkeutuminen voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
 
 Muistivirheiksi luokitellaan tyypillisesti muun muassa
 taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin käyttö:
@@ -110,13 +110,13 @@ taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
           sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting,SplintLCLint}.
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
-    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
+    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa, \fixme[tämä on edellisen erikoistapaus]
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
           ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[\S 7.24.1]{CSpec}.
 % If an array is accessed beyond the end of an object, the behavior is undefined.
           Seuraukset ovat enimmäkseen samat kuin taulukon yli indeksoimisella.
-          Puskureiden ylivuoto on C:ssä harmillisen helppo tehdä.
-          Jo C:n standardikirjastosta löytyy funktioita joille ei ole ollenkaan mahdollista antaa tulospuskurin
+          Puskureiden ylivuoto on C:ssä harmillisen helppo aiheuttaa.
+          Jo C:n standardikirjastosta löytyy funktioita joille ei ole lainkaan mahdollista antaa tulospuskurin
           kokoa ja siten aiheuttavat ylivuodon jos tulos ei mahdu puskuriin~\cite{StaticallyDetecting,SplintLCLint}.
           Tällaisia funktioita ei koskaan pitäisi käyttää syötteen käsittelyn yhteydessä.
           Puskurin ylivuodot pinossa ovatkin yleinen syy RCE-haavoittuvuuksille~\cite{SplintLCLint}.
@@ -171,7 +171,7 @@ Tarkastellaan seuraavassa kappaleessa tietoturvatestaamisen menetelmiä.
 \label{Testausmenetelmat}
 
 Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattiset testit~\cite[23.1]{Sommerville}.
-Testausta voidaankin soveltaa tietoturvaongelmien välttämiseen tietyin edellytyksin:
+Testausta voidaan soveltaa myös tietoturvaongelmien välttämiseen tietyin edellytyksin:
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
 Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi ikisilmukat).
@@ -207,10 +207,9 @@ Eräs tällainen työkalu on laajasti käytetty Valgrind.
 \subsection{Valgrind}
 
 Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien ajonaikaiseen instrumentointiin
-perustuva työkalu, jota käytetään useimmiten muistivirheiden etsintään.
+perustuva työkalu, jota käytetään useimmiten muistivirheiden etsintään~\cite{Valgrind}.
 Valgrind itsessään on laajempi kehys ajonaikaiseen instrumentointiin,
 josta muistivirheitä löytävä \emph{Memcheck}-työkalu on ylivoimaisesti käytetyin.
-
 Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumentoimana ajamalla
 \texttt{valgrind \emph{ohjelma}}.
 
