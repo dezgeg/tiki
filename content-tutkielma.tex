@@ -1,6 +1,6 @@
 \section{Johdanto}
 
-Ohjelmistojen haavoittuvuukset ovat verrattaen ikäviä:
+Ohjelmistojen haavoittuvuudet ovat verrattaen ikäviä:
 tietoturva-aukoista aiheutuneesta ylimääräisestä työstä tietojärjestelmien ylläpitäjille
 sekä menetetystä työajasta voi seurata suuria rahallisia tappioita,
 puhumattakaan mahdollisista henkilötietojen tai yrityssalaisuuksien vuotamisesta.
@@ -35,14 +35,14 @@ Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii
 ylläpitäjän hallintavalikkoon, ei kyseisellä virheellä ole suhteellisesti kovin suurta tietoturvamerkitystä.
 Jos käyttäjällä kerran on ylläpitäjän oikeudet, niin samaan lopputulokseen päädytään mikäli kyseinen
 käyttäjä yksinkertaisesti sammuttaa palvelimen tavallisia keinoja käyttäen.
-Sen sijaan jos vaikkapa Javascript-sovelmat selaimessa pääsevät lukemaan käyttäjän tiedostoja,
+Sen sijaan jos vaikkapa JavaScript-sovelmat selaimessa pääsevät lukemaan käyttäjän tiedostoja,
 on tilanne vakavampi,
 koska web-sivujen katselemisen on tarkoitus olla turvallista ja selaimen siten
 kuuluu estää sovelmien pääsy tiedostojärjestelmään.
 Vastaavaan tapaan tavallisen käyttäjän pääsy suorittamaan ohjelmia ylläpitäjän oikeuksilla
 tai käyttöjärjestelmätilassa rikkoo luottamusrajan~\cite{ViolatingAssumptions}.
 
-Tietoturvahaavoittuvuuden vakavuuden luokitteluun on kehitelty joitakin suuntaa-antavia kvantitatiivisiä menetelmiä.
+Tietoturvahaavoittuvuuden vakavuuden luokitteluun on kehitelty joitakin suuntaa-antavia kvantitatiivisia menetelmiä.
 Näistä käytetyimpiä on NIST:n kehittämä ja standardisoitu CVSS\footnote{\url{http://nvd.nist.gov/cvss.cfm}} (Common Vulnerability Scoring System)~\cite{CVSS}.
 Siinä yksittäisen haavoittuvuuden vakavuus määritellään lukuna välillä 0--10,
 missä korkeampi luku tarkoittaa vakavampaa haavoittuvuutta.
@@ -50,7 +50,7 @@ Tämä pistemäärä muodostuu kuudesta eri osa-alueesta,
 kuten kuinka monimutkaista haavoittuvuuden hyödyntäminen on ja kuinka paljon käyttöoikeuksia siihen vaaditaan.
 
 CVSS:n ohella NIST ylläpitää tietokantaa kaikista levityksessä olevien ohjelmien julkiseksi tuoduista haavoittuvuuksista.
-CVE-tietokanta\footnote{\url{http://cve.mitre.org}} on alan standardi ja julkaistuihin haavoittuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
+CVE-tietokanta\footnote{\url{http://cve.mitre.org}} on alan standardi ja julkaistuihin haavoittuvuuksiin viitataan usein `CVE-2013-1234'-muotoisella tunnisteella.
 Tällaiset haavoittuvuustietokannat ovat mahdollistaneet haavoittuvuuksien analysoimisen ja tarkemman luokittelun.
 Tietoturvahaavoittuvuuksia luokittelemalla on todettu,
 että tietoturvaongelmiin johtavat ohjelmointivirheet ovat yhteisiä kaikille ohjelmistoille,
@@ -80,7 +80,7 @@ ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution).
 Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla lisäseurauksia.
 Esimerkiksi prosessilla ei ole yleensä mahdollisuutta siivota väliaikais- tai lukkotiedostoja,
 jotka voivat jäädä viemään levytilaa tai estämään ohjelman käyn\-nis\-tä\-mi\-sen,
-mikäli ohjelma käyttää lukkotiedostoa es\-tä\-mään useamman ohjelmainstanssin ajamisen yhtäaikaa.
+mikäli ohjelma käyttää lukkotiedostoa es\-tä\-mään useamman ohjelmainstanssin ajamisen yhtä aikaa.
 Hallitsematon sulkeutuminen voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
 
 Muistivirheiksi luokitellaan tyypillisesti muun muassa
@@ -126,7 +126,7 @@ taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin
           ja ohjelman kaatumiseen.
 
 \end{itemize}
-Edellisten lisäksi C-ohjelmoijan täytyy huoleehtia dynaamisesti varatun muistin vapauttamisesta.
+Edellisten lisäksi C-ohjelmoijan täytyy huolehtia dynaamisesti varatun muistin vapauttamisesta.
 Tästä aiheutuu vielä lisää mahdollisia virhetilanteita,
 kuten muistivuotoja tai dynaamisen muistin vapauttamista kahdesti:
 
@@ -141,7 +141,7 @@ kuten muistivuotoja tai dynaamisen muistin vapauttamista kahdesti:
           Muistialueen vapauttamisen jälkeen sama muistialue voidaan antaa esimerkiksi
           ohjelman jonkun toisen moduulin muistivarauksen käyttöön.
           Jos nyt alkuperäistä, jo vapautettua muistialuetta yritetään vapauttaa,
-          mikä näinollen aiheuttaisi jonkun toisen, täysin liittymättömän muistialueen vapauttamisen.
+          mikä näin ollen aiheuttaisi jonkun toisen, täysin liittymättömän muistialueen vapauttamisen.
           Yleensä vapautetun muistialueen vapauttaminen uudelleen aiheuttaa muistinhallintakirjaston
           sisäisten tietorakenteiden korruptoitumisen,
           joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
@@ -227,7 +227,7 @@ Lint osaa varoittaa esimerkiksi seuraavista virheistä~\cite{Lint}:
    \item Yllättävä operaattoripresedenssi.
          Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
          mutta C:ssä \texttt{==}\,-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
-         jollon ehtolausekkeen tulokseksi tulee aina \texttt{0}.
+         jolloin ehtolausekkeen tulokseksi tulee aina \texttt{0}.
 \end{itemize}
 
 Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
@@ -254,7 +254,7 @@ Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde
 saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
 Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
 esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
-koko annettiin parametrinä.
+koko annettiin parametrina.
 Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
 puskurin turvallisen käytön edellyttämistä ehdoista ja
 puskurin todellisen koon aiheuttamista ehdoista ristiriita.
@@ -283,7 +283,7 @@ Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumento
 Valgrind toimii muuntamalla suorituksessa olevan natiivikonekielilohkon\fixme omalle
 arkkitehtuuririippumattomalle välikielelleen,
 ja tekee sille tarvittavia työkalukohtaisia muunnoksia.
-Memcheck-työkaluun instrumentointiin liittyy kaksi osa-aluetta:
+Memcheck-työkalun instrumentointiin liittyy kaksi osa-aluetta:
 sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
 Jälkimmäistä varten jokaista osoiteavaruuden tavua varten on varattu nk. A-bitti (accessible),
 joka kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
@@ -371,7 +371,7 @@ Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
 % Fuzzeri sen sijaan saattaakin luoda äänitiedostoja, joissa on esimerkiksi 0, -89 tai 4000000 äänikanavaa.
 Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
 voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
-Liian suurista luvuista voi aiheutua aritmeettisiä ylivuotoja laskutoimituksissa.
+Liian suurista luvuista voi aiheutua aritmeettisia ylivuotoja laskutoimituksissa.
 Esimerkiksi monissa tiedostoformaateissa täytyy lukea levyltä tietoa taulukoihin.
 Jos esimerkiksi pitää luoda taulukko 128-tavuisia merkkijonoja varten siten,
 että taulukon alkioiden lukumäärä luetaan 32-bittisestä kentästä tiedostossa,
@@ -429,7 +429,7 @@ Tämän innoittamana kehitettiin \emph{fuzz}-niminen työkalu Unix-komentorivioh
 
 Fuzz-ohjelma yksinkertaisesti tulostaa standarditulostusvirtaansa satunnaisia tavuja,
 jotka yhdistetään Unix-putkella testattavan ohjelman standardisyötevirtaan~\cite{UnixReliability}.
-Fuzzin komentoriviparametreillä voi jossain määrin vaikuttaa fuzzin generoimaan syötteeseen:
+Fuzzin komentoriviparametreilla voi jossain määrin vaikuttaa fuzzin generoimaan syötteeseen:
 syötteen pituus on määriteltävissä sekä ASCII-kontrollimerkit saa kytkettyä päälle tai pois.
 Kokonaisuudessaan fuzzin generoimassa syötteessä ei ollut lähes ollenkaan rakennetta;
 tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
@@ -453,7 +453,7 @@ operaattoreita (kuten \texttt{+}, \texttt{*}).
 Tätä prosessia toistetaan niin kauan kunnes on saatu halutun kokoinen säännöllinen lauseke,
 joka voidaan antaa syötteeksi testattavalle säännöllisten lausekkeiden toteutukselle.
 Esimerkiksi regfuzzia testattiin alun perin pääosin PCRE-kirjastolle,
-joka on käytössä muun muassa useiden selainten Javascript-toteutuksissa sekä Adobe Flashissa.
+joka on käytössä muun muassa useiden selainten JavaScript-toteutuksissa sekä Adobe Flashissa.
 Regfuzz paljasti PCRE-kirjastosta mahdollisia palvelunestohyökkäyksiä liittyen
 virheellisten Unicode-merkkien käsittelyyn sekä tietyntyyppisten validienkin
 säännöllisten lausekkeiden aiheuttamaan suureen muistinkulutukseen.
