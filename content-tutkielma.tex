@@ -60,22 +60,6 @@ Automaattisen tietoturvatestauksen kannalta tämä on erittäin hyvä asia,
 sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä vaivalla.
 \fixme[tarvitaanko / lähde]
 
-\begin{table}
-\centerline{\begin{tabular}{l|l|l}
-    CVE-tunniste  & CVSS-pisteet    & Kuvaus \\ \hline
-%
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0893}{CVE-2013-0893} & 6.8 (Keskitaso) & Kilpatilanne mediatiedostojen käsittelyssä.                       \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0894}{CVE-2013-0894} & 7.5 (Korkea)    & Puskurin ylivuoto Vorbis-dekooderissa.                            \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0895}{CVE-2013-0895} & 7.5 (Korkea)    & Virheellinen tiedostopolkujen käsittely tiedostoja kopioitaessa.  \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0896}{CVE-2013-0896} & 7.5 (Korkea)    & Muistinkäsittelyongelmia liitännäisten sanomien käsittelyssä.     \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0897}{CVE-2013-0897} & 4.3 (Keskitaso) & Taulukon yli luku yhdellä PDF-tiedostojen käsittelyssä.           \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0898}{CVE-2013-0898} & 7.5 (Korkea)    & Vapautetun muistin käyttö URL:ien käsittelyssä.                   \\
-    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0899}{CVE-2013-0899} & 5.0 (Keskitaso) & Kokonaisluvun ylivuoto Opus-tiedostojen käsittelyssä.             \\
-\end{tabular}}
-\caption{Osa Google Chrome-selaimen 21.2.2013 julkaistun päivityksen korjaamista haavoittuvuuksista (yhteensä 22)\cite{ChromeBugs}.}
-\label{chromiumTaulukko}
-\end{table}
-
 \subsection{Muistiturvallisuus}
 \label{Muistivirheet}
 
@@ -163,6 +147,22 @@ kuten muistivuotoja tai dynaamisen muistin vapauttamista kahdesti:
           joka voi tietyissä tilanteissa johtaa ulkopuolisen koodin suoritukseen~\cite{DoubleFree}.
 \end{itemize}
 
+\begin{table}[H]
+\centerline{\begin{tabular}{l|l|l}
+    CVE-tunniste  & CVSS-pisteet    & Kuvaus \\ \hline
+%
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0893}{CVE-2013-0893} & 6.8 (Keskitaso) & Kilpatilanne mediatiedostojen käsittelyssä.                       \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0894}{CVE-2013-0894} & 7.5 (Korkea)    & Puskurin ylivuoto Vorbis-dekooderissa.                            \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0895}{CVE-2013-0895} & 7.5 (Korkea)    & Virheellinen tiedostopolkujen käsittely tiedostoja kopioitaessa.  \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0896}{CVE-2013-0896} & 7.5 (Korkea)    & Muistinkäsittelyongelmia liitännäisten sanomien käsittelyssä.     \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0897}{CVE-2013-0897} & 4.3 (Keskitaso) & Taulukon yli luku yhdellä PDF-tiedostojen käsittelyssä.           \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0898}{CVE-2013-0898} & 7.5 (Korkea)    & Vapautetun muistin käyttö URL:ien käsittelyssä.                   \\
+    \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0899}{CVE-2013-0899} & 5.0 (Keskitaso) & Kokonaisluvun ylivuoto Opus-tiedostojen käsittelyssä.             \\
+\end{tabular}}
+\caption{Osa Google Chrome-selaimen 21.2.2013 julkaistun päivityksen korjaamista haavoittuvuuksista (yhteensä 22)\cite{ChromeBugs}.}
+\label{chromiumTaulukko}
+\end{table}
+
 Taulukossa \ref{chromiumTaulukko} on listattu joitakin viimeaikaisia Google Chrome-selaimen haavoittuvuuksia,
 joista enemmistö on muistivirheitä,
 mikä kertoo muistivirheiden yleisyydestä.
@@ -198,6 +198,68 @@ tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\
 Tarkastellaan seuraavaksi kahta automaattista testausmenetelmää: staattista analyysiä
 kappaleessa \ref{StaattinenAnalyysi} ja fuzzausta kappaleessa \ref{Fuzzaus}.
 \fixme[vanhentunut]
+
+\section{Lähdekoodin staattinen analyysi}
+\label{StaattinenAnalyysi}
+
+Staattinen analyysi on whitebox-menetelmä jossa yritetään paikantaa ohjelman
+lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
+Monista täl\-lai\-sis\-ta ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
+Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
+Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
+ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
+esimerkiksi Coverity~\cite{Coverity}.
+
+% \subsection{Lint}
+
+Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
+Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
+vaan yksinkertaiset ohjelmointivirheet, C-kääntäjää tarkempi tyypintarkastus sekä siirrettävyysongelmat.
+Lint osaa varoittaa esimerkiksi seuraavista virheistä~\cite{Lint}:
+
+\begin{itemize}
+    \item Alustamattoman muuttujan arvon käyttö.
+    \item Käyttämättömät muuttujat tai funktiot.
+    \item Saavuttamattomat koodirivit.
+    \item ``Järjettömät'' vertailut.
+           Esimerkiksi etumerkittömälle kokonaislukumuuttujalle \texttt{x} ei ehtolauseke
+           \texttt{if (x < 0)} ole koskaan tosi.
+   \item Yllättävä operaattoripresedenssi.
+         Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
+         mutta C:ssä \texttt{==}\,-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
+         jollon ehtolausekkeen tulokseksi tulee aina \texttt{0}.
+\end{itemize}
+
+Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
+joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle~\cite{Lint}.
+Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
+kun taas Lint tarkastelee tiedostoja kokonaisuutena,
+mikä mahdollistaa tarkemman analyysin~\cite{Lint}.
+Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä
+jo käännösaikana~\cite{SecurityRootOfTheProblem} ja uudempien ohjelmointikielten,
+esimerkiksi Javan, spesifikaatiot vaativat tällaiset tarkistukset~\cite[22.3]{Sommerville}.
+
+Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
+Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
+Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelmisto on Splint
+(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint~\cite{SplintLCLint}.
+
+Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
+mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
+Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi lausekalkyylin toteutuvuusongelmana
+(\emph{satisfiability problem})~\cite{SplintLCLint}.
+Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
+\emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
+Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
+saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
+Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
+esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
+koko annettiin parametrinä.
+Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
+puskurin turvallisen käytön edellyttämistä ehdoista ja
+puskurin todellisen koon aiheuttamista ehdoista ristiriita.
+Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
+\fixme[Viimeistele luku]
 
 \section{Ohjelman ajonaikainen instrumentointi}
 \label{DynaaminenInstrumentointi}
@@ -293,67 +355,8 @@ ja Memcheck antaa virheen. \fixme[Aika kuraa.]
 \label{ValgrindEsimerkki}
 \end{figure}
 
-\section{Lähdekoodin staattinen analyysi}
-\label{StaattinenAnalyysi}
-
-Staattinen analyysi on whitebox-menetelmä jossa yritetään paikantaa ohjelman
-lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
-Monista täl\-lai\-sis\-ta ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
-Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston käännösaikana.
-Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
-ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
-esimerkiksi Coverity~\cite{Coverity}.
-
-% \subsection{Lint}
-
-Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
-Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
-vaan yksinkertaiset ohjelmointivirheet, C-kääntäjää tarkempi tyypintarkastus sekä siirrettävyysongelmat.
-Lint osaa varoittaa esimerkiksi seuraavista virheistä~\cite{Lint}:
-
-\begin{itemize}
-    \item Alustamattoman muuttujan arvon käyttö.
-    \item Käyttämättömät muuttujat tai funktiot.
-    \item Saavuttamattomat koodirivit.
-    \item ``Järjettömät'' vertailut.
-           Esimerkiksi etumerkittömälle kokonaislukumuuttujalle \texttt{x} ei ehtolauseke
-           \texttt{if (x < 0)} ole koskaan tosi.
-   \item Yllättävä operaattoripresedenssi.
-         Esimerkiksi \texttt{if (x \& 0x10 == 0)} näyttää päällisin puolin bittitarkistukselta,
-         mutta C:ssä \texttt{==}\,-operaattori sitoo \texttt{\&}-operaattoria vahvemmin,
-         jollon ehtolausekkeen tulokseksi tulee aina \texttt{0}.
-\end{itemize}
-
-Tuon ajan C-kääntäjissä kääntämisen nopeus oli korkeammalla prioriteetilla,
-joten tämänkaltaisetkin kriittiset tarkastukset ulkoistettiin Lint-ohjelmalle~\cite{Lint}.
-Esimerkiksi C-kääntäjät tyypillisesti käsittelevät yhtä C-tiedostoa kerrallaan,
-kun taas Lint tarkastelee tiedostoja kokonaisuutena,
-mikä mahdollistaa tarkemman analyysin~\cite{Lint}.
-Nykyiset C-kääntäjät osaavat varoittaa e\-del\-lä\-mai\-ni\-tuis\-ta virheistä
-jo käännösaikana~\cite{SecurityRootOfTheProblem} ja uudempien ohjelmointikielten,
-esimerkiksi Javan, spesifikaatiot vaativat tällaiset tarkistukset~\cite[22.3]{Sommerville}.
-
-Monet vastaavanlaiset staattisen analyysin työkalut eri kielille ovat nimetty
-Lint-ohjelman mukaan, esimerkiksi JSLint JavaScript-kielelle.
-Erityisesti C-kielen tietoturvaongelmiin keskittynyt staattisen analyysin ohjelmisto on Splint
-(Secure Programming Lint), joka on aiemmin kulkenut nimellä LCLint~\cite{SplintLCLint}.
-
-Splint on keskittynyt löytämään samankaltaisia virheitä kuin Lint,
-mutta lisäksi myös muistivirheitä sekä muistivuotoja C-kielisistä ohjelmista.
-Muistivirheiden löytäminen tapahtuu esittämällä ohjelmakoodi lausekalkyylin toteutuvuusongelmana
-(\emph{satisfiability problem})~\cite{SplintLCLint}.
-Ohjelmaan on määritelty jokaista C-kirjaston puskurinkäsittelyfunktiota kohti joukko
-\emph{alkuehtoja}, joiden täytyy päteä funktiota kutsuttaessa.
-Esimerkiksi kopioitaessa merkkijonoa \texttt{strcpy}-funktiolla ei osoitin kohde- tai lähdepuskuriin
-saa olla \texttt{NULL} sekä kohdepuskurin koko täytyy olla vähintään yhtä suuri kuin lähdepuskurin.
-Muistia varaavat funktiot ja konstruktiot sen sijaan tuottavat \emph{jälkiehtoja} -
-esimerkiksi onnistuneen \texttt{malloc}-funktiokutsun tuloksena on puskuri, jonka
-koko annettiin parametrinä.
-Näiden symbolisten ehtojen perusteella Splint yrittää selvittää syntyykö
-puskurin turvallisen käytön edellyttämistä ehdoista ja
-puskurin todellisen koon aiheuttamista ehdoista ristiriita.
-Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
-\fixme[Viimeistele kappale]
+\fixme[Viimeistele luku]Vertaa staattiseen analyysiin hieman, johdattele fuzzaukseen.
+Ennen vai jälkeen kuvaa?
 
 \section{Fuzzaus}
 \label{Fuzzaus}
