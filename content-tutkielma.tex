@@ -26,7 +26,7 @@ tarkemmin kolmesta menetelmästä: staattisesta analyysista, dynaamisesta instru
 
 \section{Tietoturvahaavoittuvuudet}
 \label{YleinenTietoturva}
-\subsection{Yleisesti}
+\subsection{Haavoittuvuuksien luokittelua}
 Tietoturvahaavoittuvuuden vakavuuteen vaikuttaa keskeisesti aiheutuuko siitä \emph{luottamusrajan}
 (trust boundary) ylitys~\cite{ViolatingAssumptions}.
 Esimerkiksi jos jonkun palvelun kaatavan ohjelmointivirheen laukaiseminen vaatii käyttäjältä pääsyä
@@ -56,7 +56,6 @@ riippumatta niiden toimialasta.
 Tällaiset yleispätevät haavoittuvuudet on kirjattu CWE-nimiseen tietokantaan (Common Weakness Enumeration).
 Automaattisen tietoturvatestauksen kannalta tämä on erittäin hyvä asia,
 sillä menetelmiä voidaan uudelleenkäyttää ohjelmasta toiseen pienemmällä vaivalla.
-\fixme[tarvitaanko / lähde]
 
 \subsection{Muistiturvallisuus}
 \label{Muistivirheet}
@@ -95,7 +94,7 @@ taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin
           Suurin riski pinossa olevan taulukon ohi kirjoittamisessa onkin aktivaatiotietueessa
           sijaitsevan funktion paluuosoitteen ylikirjoittaminen~\cite{StaticallyDetecting,SplintLCLint}.
           Tästä seuraa käytännössä suoraan mielivaltaisen koodin suoritus.
-    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa, \fixme[tämä on edellisen erikoistapaus]
+    \item Puskurin ylivuoto: Vastaavasti kuin taulukoiden kanssa,
           C-kielessä täytyy merkkijonoja ja tavupuskureita kopioitaessa tai luettaessa
           ohjelmoijan itse huolehtia, että puskurissa on riittävästi tilaa~\cite[\S 7.24.1]{CSpec}.
 % If an array is accessed beyond the end of an object, the behavior is undefined.
@@ -259,10 +258,8 @@ puskurin turvallisen käytön edellyttämistä ehdoista ja
 puskurin todellisen koon aiheuttamista ehdoista ristiriita.
 Tällöin puskurin ylivuoto on mahdollinen ja Splint antaa siitä varoituksen~\cite{SplintLCLint}.
 
-\subsection{Yhteenveto}
 Yksinkertaiset lähdekoodin staattiseen analyysiin perustuvia menetelmät ovat laajasti käytössä monien kääntäjien tarjoamien varoitusten muodossa,
 joskin painottuneena enemmän ohjelmointivirheisiin yleisesti kuin tietoturva-aiheisiin virheisiin.
-Monimutkaisemmissa tilanteissa virheellisten varoitusten määrä kasvaa \fixme[joku lähde].
 Haavoittuvuustestaamisen kannalta staattisen analyysin haittapuolena on vaatimus päästä käsiksi testattavan ohjelmiston lähdekoodiin,
 mikä ei usein kaupallisten ohjelmistojen tapauksessa ole mahdollista muille kuin ohjelmiston kehittäneelle taholle.
 
@@ -287,9 +284,9 @@ Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumento
 
 Valgrindin toimintaperiaate muistuttaa läheisesti monia virtuaalikoneita ja prosessoriemulaattoreita.
 Instrumentoitavaa konekielistä ohjelmaa ei siis ajetakaan suoraan prosessorilla kuten tavallisesti,
-vaan se ensin käännetään lennossa Valgrindin sisäiselle alustariippumattomalle välikielelle.
-Tälle välikieliselle ohjelmalle työkalut (kuten Memcheck) voivat tehdä tarvittavia muunnoksia,
-jonka jälkeen muunnettu välikielinen ohjelma JIT-käännetään natiiville konekielelle.
+vaan se ensin käännetään lennossa Valgrindin sisäiselle alustariippumattomalle vä\-li\-kie\-lel\-le.
+Tälle vä\-li\-kie\-li\-sel\-le ohjelmalle työkalut (kuten Memcheck) voivat tehdä tarvittavia muunnoksia,
+jonka jälkeen muunnettu vä\-li\-kie\-li\-nen ohjelma JIT-käännetään natiiville konekielelle.
 Memcheck-työkalun instrumentointiin liittyy kaksi osa-aluetta:
 sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
 
