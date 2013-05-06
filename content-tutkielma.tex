@@ -15,7 +15,6 @@ Lähdekoodin puuttuessa täytyy ensin ohjelmatiedosto takaisinkääntää
 disassembler-ohjelmalla symboliselle konekielelle
 ja tutkia ohjelmaa konekielitasolla.
 Kummassakin tapauksessa ihmisvoimin tapahtuva tutkiminen on työlästä ja aikaavievää, joten automatisoitu ratkaisu on paikallaan.
-\fixme[selitä testaus]
 
 Tarkastelen tässä tutkielmassa erityisesti C- ja C++-kielisten ohjelmien tyypillisiä tietoturvahaavoittuvuuksia
 ja automaattisia menetelmiä niiden löytämiseen.
@@ -75,7 +74,7 @@ Unix-pohjaisissa järjestelmissä tämä tunnetaan segmentointivirheenä (Segmen
 Koska muistivirheistä aiheutuu useimmiten ohjelman kaatuminen,
 mahdollistaa muistivirheen olemassaolo \emph{palvelunestohyökkäyksen} (DoS-hyökkäys eli Denial-of-Service -hyökkäys).
 Kriittisimmillään muistivirheet voivat sallia hyökkääjän suorittaa mielivaltaista koodia
-ohjelmaprosessin käyttöoikeuksilla (RCE, Remote Code Execution). \fixme[selitä ehkä lisää]
+ohjelmaprosessin käyttöoikeuksilla (RCE-hyökkäys eli Remote Code Execution-hyökkäys).
 Kuitenkin pelkällä prosessin pakotetulla sulkeutumisellakin voi olla lisäseurauksia.
 Esimerkiksi prosessilla ei ole yleensä mahdollisuutta siivota väliaikais- tai lukkotiedostoja,
 jotka voivat jäädä viemään levytilaa tai estämään ohjelman käyn\-nis\-tä\-mi\-sen,
@@ -158,15 +157,14 @@ kuten muistivuotoja tai dynaamisen muistin vapauttamista kahdesti:
     \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0898}{CVE-2013-0898} & 7.5 (Korkea)    & Vapautetun muistin käyttö URL:ien käsittelyssä.                   \\
     \href{http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0899}{CVE-2013-0899} & 5.0 (Keskitaso) & Kokonaisluvun ylivuoto Opus-tiedostojen käsittelyssä.             \\
 \end{tabular}}
-\caption{Osa Google Chrome-selaimen 21.2.2013 julkaistun päivityksen korjaamista haavoittuvuuksista (yhteensä 22)\cite{ChromeBugs}.}
+\caption{Osa Google Chrome-selaimen 21.2.2013 julkaistun päivityksen korjaamista 22:sta haavoittuvuudesta \cite{ChromeBugs}.}
 \label{chromiumTaulukko}
 \end{table}
 
 Taulukossa \ref{chromiumTaulukko} on listattu joitakin viimeaikaisia Google Chrome-selaimen haavoittuvuuksia,
-joista enemmistö on muistivirheitä,
-mikä kertoo muistivirheiden yleisyydestä.
-Muistivirheiden vakavuuden ja yleisyyden takia lähes kaikki tietoturvatestaamisen menetelmät
-kykenevät löytämään muistivirheitä.
+joista noin puolet on muistivirheitä.
+Muistivirheiden vakavuuden ja yleisyyden takia useat C-kielisille ohjelmistoille suunnatut  tietoturvatestaamisen työkalut
+keskittyvät löytämään juurikin muistivirheitä.
 Tarkastellaan seuraavassa kappaleessa tietoturvatestaamisen menetelmiä.
 
 \section{Testausmenetelmät}
@@ -194,9 +192,8 @@ Tä\-män\-kal\-tai\-seen testaukseen on tapoja huomattavasti enemmän.
 Esimerkiksi jotkut keinot voivat vaatia pääsyä ohjelman lähdekoodiin,
 tai sitten ohjelman suoritusta voidaan analysoida tai muuttaa konekielitasolla~\cite{OuluBrowser}.
 
-Tarkastellaan seuraavaksi kahta automaattista testausmenetelmää: staattista analyysiä
-kappaleessa \ref{StaattinenAnalyysi} ja fuzzausta kappaleessa \ref{Fuzzaus}.
-\fixme[vanhentunut]
+Tarkastellaan seuraavaksi itse testausmenetelmiä,
+aloittaen lähdekoodin staattisesta analyysista.
 
 \section{Lähdekoodin staattinen analyysi}
 \label{StaattinenAnalyysi}
@@ -275,14 +272,14 @@ Luvussa \ref{Muistivirheet} tarkasteltiin muistivirheitä ja huomattiin,
 että useat muistivirheet johtuvat ajonaikaisten tarkistusten puutteesta.
 Jotta voitaisiin varmistua ohjelman olevan vapaa muistivirheistä,
 olisi testauksen ajaksi suotavaa saada tällaiset ajonaikaiset tarkistukset päälle.
-Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen (tai dynaamiseen) instrumentointiin} perustuvia työkaluja,
+Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen instrumentointiin} tai \emph{dynaamiseen instrumentointiin} perustuvia työkaluja,
 jolla käännettyyn ohjelmatiedostoon voidaan ajonaikana lisätä ylimääräisiä tarkistuksia.
 Eräs tällainen työkalu on laajasti käytetty Valgrind.
 
 \subsection{Valgrind}
 
 Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien dynaamiseen instrumentointiin
-perustuva työkalu\fixme[toistoa aika rankasti], jota käytetään useimmiten muistivirheiden etsintään~\cite{Valgrind}.
+perustuva työkalu, jota käytetään useimmiten muistivirheiden etsintään~\cite{Valgrind}.
 Valgrind itsessään on laajempi kehys dynaamiseen instrumentointiin,
 josta muistivirheitä löytävä \emph{Memcheck}-työkalu on ylivoimaisesti käytetyin.
 Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumentoimana ajamalla
@@ -296,49 +293,48 @@ jonka jälkeen muunnettu välikielinen ohjelma JIT-käännetään natiiville kon
 Memcheck-työkalun instrumentointiin liittyy kaksi osa-aluetta:
 sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
 
-Jälkimmäistä varten jokaista osoiteavaruuden tavua varten on varattu nk. A-bitti (accessible),
-joka kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
-Ohjelman alussa ainoastaan itse muistissa oleva ohjelmatiedosto on merkattu käytettäväksi.
-Memcheck kaappaa kutsut C:n muistinhallintafunktioihin,
-ja joko asettaa tai poistaa A-bittejä kun keosta varataan tai vapautetaan muistia.
+Jälkimmäistä varten Memcheck varaa jokaista osoiteavaruuden tavua varten yhden ylimääräisen bitin muistia.
+Tämä nk. A-bitti (accessible) kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
 Lisäksi Memcheck instrumentoi ohjelman jokaisen muistiin viittaavan konekäskyn
-ensiksi tarkistamaan osoitetta vastaavan A-bitin arvon,
-ja aiheuttaa virheen mikäli ohjelma yrittää viitata varaamattomaan muistiin.
-Näin voidaan konekäskyn tarkkuudella paikantaa missä kohtaa koodia
-muistivirhe tapahtuu.
+ensiksi tarkistamaan muistiosoitetta vastaavan A-bitin arvon.
+Jos A-bitti ei ollut päällä,
+yritti ohjelma viitata kiellettyyn muistiosoitteeseen ja
+Memcheck tulostaa virheilmoituksen.
+Memcheckin täytyy vielä sisäisesti pitää kirjaa ohjelman varaamista muistialueista,
+joten se kaappaa kaikki kutsut sekä käyttöjärjestelmän että C-kirjaston muistinhallintafunktioihin,
+ja korvaa ne omalla toteutuksellaan joka päivittää A-bittejä muistia varatessa tai sitä vapautettaessa.
 
 Alustamattoman muistin käytön seuranta on Memcheckille haastavampi operaatio.
-Yksinkertainen ratkaisu, jossa tulostetaan virhe aina ladattaessa
-tavu alustamattomasta muistista, ei nimittäin toimi hyvin, vaan aiheuttaa
-useita aiheettomia varoituksia.
+Voisi helposti kuvitella,
+että jokainen muistihaku alustamattoman arvon sisältävästä muistipaikasta olisi virhetilanne.
+Kuitenkin monet täysin korrektit C-ohjelmat tekevät tällaisia muistihakuja.
 Tämä johtuu täytetavuista, joita C-kääntäjä saattaa joutua lisäämään struktuureiden keskelle.
 Useissa prosessoreissa esimerkiksi neljätavuisen muuttujan muistiosoitteen täytyy olla neljällä jaollinen,
 jolloin 1-tavuisen ja 4-tavuisen kentän sisältävään struktuuriin täytyy lisätä kolme täytetavua
 1-tavuisen kentän jälkeen.
 Kääntäjä ei koskaan käytä näitä tietorakenteiden täytetavuja mihinkään, eikä myöskään alusta niitä.
 Kuitenkin kokonaisia struktuureita kopioivat funktiot, kuten \texttt{memcpy},
-kopioivat nämä täytetavut muiden struktuurin kenttien mukana.
-Tämä voi tapahtua täysin korrekteissa ohjelmissa,
-joten virheilmoituksen antaminen tästä ei ole suotavaa.
+kopioivat nämä täytetavut muiden struktuurin kenttien mukana,
+ja aiheuttaisivat paljon turhia varoituksia.
 
-Memcheckin käyttämä algoritmi on huomattavasti monimutkaisempi.
+Tämän vuoksi Memcheck käyttää huomattavasti monimutkaisempaa logiikkaa tunnistaakseen virheellisen alustamattoman muistin käytön.
 Erityisesti alustamattomia arvoja saa lukea muistista ja jopa käyttää useimmissa laskutoimituksissa ilman virheilmoitusta.
 Memcheck ei anna varoitusta laskutoimituksen määrittelemättömästä arvosta niin kauan kun voidaan nähdä,
 että alustamaton arvo ei ole \emph{havaittavasti} vaikuttanut ohjelman suoritukseen.
-Tämä on toteutettu varaamalla jokaiselle ohjelman käsittelemälle bitille dataa (sekä rekistereissä että muistissa)
-on varattu ylimääräinen V-bitti (valid),
-joka kertoo onko kyseisen bitin arvo hyvinmääritelty vai ei.
-Määrittelemättömiä arvoja syntyy `itsestään' vain kahdesta lähteestä:
+Tämä on toteutettu varaamalla jokaiselle ohjelman käsittelemälle bitille dataa, sekä rekistereissä että muistissa, ylimääräinen V-bitti (valid).
+V-bitti kertoo onko kyseisen bitin arvo hyvinmääritelty vai ei.
+Alustamattoman muistin sisältö on määritelmällisesti ei-hyvinmääritelty.
+Eli määrittelemättömiä arvoja syntyy `itsestään' vain kahdesta lähteestä:
 funktiokutsun yhteydessä syntyvistä paikallisista muuttujista sekä varatusta dynaamisesta muistista.
-Jälkimmäistä tapausta varten Memcheck yksinkertaisesti asettaa dynaamista muistia varattaessa uuden muistialueen kaikki V-bitit nollaksi.
-Paikallisia muuttujia varten Memcheckin täytyy instrumentoida pinosta muistia varaavat käskyt (pino-osoitinta lisäävät tai vähentävät käskyt)
-nollaamaan kyseisen alueen V-bitit.
-Lisäksi jokainen dataa käsittelevä konekäsky instrumentoidaan päivittämään samalla lopputuloksen V-bittejä tarpeen mukaan:
+Näillä määrittelemättömillä arvoilla saa tehdä laskutoimituksia aivan normaalisti
+sillä erolla, että määrittelemättömillä arvoilla tehty laskutoimituksen tulos on yleensä edelleen määrittelemätön.
+Jokainen dataa käsittelevä konekäsky instrumentoidaan päivittämään samalla lopputuloksen V-bittejä tarpeen mukaan:
 esimerkiksi muistista rekisteriin lataava konekäsky asettaa myös kohderekisterin V-bitit muistista ladatun arvon V-biteistä.
-Useiden konekäskyjen kohdalla yksikin määrittelemätön bitti aiheuttaa koko lopputuloksen olevan määrittelemätön.
-Memcheck katsoo määrittelemättömien arvojen olevan ulkoisesti havaittavia kolmessa tapauksessa:
+Useiden konekäskyjen kohdalla yksikin määrittelemätön bitti aiheuttaa koko lopputuloksen olevan määrittelemätön,
+mutta esimerkiksi bittioperaatio määritellyn ja määrittelemättömän arvon välillä voi tuottaa lopputuloksen,
+jossa vain osa biteistä ovat määrittelemättömiä.
+Memcheck katsoo määrittelemättömien arvojen olevan ulkoisesti havaittavia seuraavissa tapauksessa:
 määrittelemätön arvo annetaan parametrina käyttöjärjestelmäkutsulle,
-määrittelemätöntä arvoa käytetään muistiosoitteena,
 tai ohjelman suoritusvuo riippuu määrittelemättömästä arvosta.
 
 Kuvassa \ref{ValgrindEsimerkki} on esimerkki alustamatonta muistia käyttävästä C-ohjelmasta
@@ -356,7 +352,7 @@ on nyt määrittelemätön.
 Ohjelman sulkeutuessa C-kirjasto välittää lopetusarvon käyttöjärjestelmälle
 Linuxissa \texttt{exit\_group}-järjestelmäkutsulla,
 jolloin alustamattoman muistin vaikutus on ulkoisesti havaittavissa,
-ja Memcheck antaa virheen. \fixme[Aika kuraa.]
+ja Memcheck antaa virheen.
 
 \begin{figure}[H]
 \lstinputlisting[language=C,numbers=left]{include/valgrindExample.c}
@@ -368,7 +364,8 @@ ja Memcheck antaa virheen. \fixme[Aika kuraa.]
 
 Valgrindin käyttö on varsin helppoa:
 testattava ohjelma käynnistetään instrumentointityökalun ajamana ja ohjelmaa voi käyttää aivan normaalisti,
-joskin suoritus on huomattavasti hitaampaa.
+joskin suoritus on huomattavasti hitaampaa:
+Memcheck-työkalu hidastaa suoritettavaa ohjelmaa yli 22-kertaisesti.
 Haavoittuvuustestauksen kannalta Valgrindilla on selkeä etu staattiseen analyysiin verrattuna sillä
 Valgrindin käyttö ei edellytä pääsyä testattavan ohjelmiston lähdekoodiin,
 joten myös muut kun ohjelmiston kehittäjät voivat käyttää Valgrindia suljetun lähdekoodin ohjelmiston haavoittuvuustestaukseen.
@@ -387,14 +384,17 @@ mutta auttaa myös kasvattamaan testaamisen aikana suoritetun koodin osuutta.
 \emph{Fuzzaus} on yleisesti käytetty keino automaattiseen testisyötteiden generointiin.
 Sen ideana on raa'asti luoda suuria määriä mahdollisia syötteitä satunnaislukujen pohjalta siinä toivossa,
 että ohjelma ei käsittele niitä oikein~\cite{UnixReliability}.
-Muun muassa aiemmin mainittuja muistivirheitä löytyy usein fuzzauksella.
-\fixme[aika tönkköä]
+
 % Tyhmä esimerkki, viimeistele?
 % Esimerkiksi useimmat maailmalla olevat äänitiedostot sisältävät suurella todennäköisyydellä vain kaksi äänikanavaa.
 % Luultavasti tätä yleisintä tapausta on myöskin testattu enemmän ja muut kanavamäärät ovat jääneet vähemmälle testaamiselle.
 % Fuzzeri sen sijaan saattaakin luoda äänitiedostoja, joissa on esimerkiksi 0, -89 tai 4000000 äänikanavaa.
-Samaten erikoisia merkkejä sisältävät merkkijonot sekä erittäin suuret tai negatiiviset lukuarvot
-voivat olla ongelmallisia~\cite{ViolatingAssumptions}.
+Esimerkiksi raja- tai erikoistapauksien käsittelyssä voi tapahtua helposti virheitä.
+Monissa kielissä, myös C:ssä,
+taulukkojen indeksointi alkaa nollasta.
+Siis esimerkiksi kymmenpaikkaisen taulukon \texttt{arr} viimeinen alkio on \texttt{arr[9]}, ei \texttt{arr[10]}.
+Myöskin vaikkapa erikoismerkit ja erittäin suuret tai negatiiviset lukuarvot
+voivat olla ohjelmien kannalta ongelmallisia~\cite{ViolatingAssumptions}.
 Liian suurista luvuista voi aiheutua aritmeettisia ylivuotoja laskutoimituksissa.
 Esimerkiksi jos ohjelman täytyy lukea tiedostosta taulukkoon 128-tavuisia struktuureita
 ja struktuurien lukumäärä on ilmoitettu tiedostossa 32-bittisessä kentässä,
@@ -436,7 +436,6 @@ aina yksinkertaisista blackbox-menetelmistä monimutkaisempiin keinoihin:
 
 \end{itemize}
 
-\fixme[wut?]
 Kä\-si\-tel\-lään seuraavaksi joitakin e\-del\-lä\-mai\-nit\-tu\-ja keinoja generoida syötteitä.
 Fuzzauksen historia alkaa kirjaimellisesti synkkänä ja myrskyisenä yönä,
 jolloin sään aiheuttamat tiedonsiirtovirheet modeemiyhteydessä koituivat ongelmaksi
@@ -496,7 +495,3 @@ eivät ne ole toisiaan poissulkevia vaan toisiaan täydentäviä:
           Yhdistämällä fuzzaukseen dynaamisen instrumentoinnin menetelmiä voidaan tiukentaa
           tiukentaa fuzzauksen kriteereitä ja etsiä myös muistivirheitä aiheuttavia syötteitä.
 \end{itemize}
-Huomattavaa on, että koska osa tietoturvaongelmista on seurausta ohjelmointivirheistä,
-niin tietoturvan parantamiseen soveltuvat ohjelmointivirheitä yleisesti paikantavat ohjelmistotekniikan menetelmät.
-Kuitenkin fuzzaus testausmenetelmänä on toimiva menetelmä erityisesti tietoturvaongelmien löytämiseen.
-\fixme[kirjoita]
