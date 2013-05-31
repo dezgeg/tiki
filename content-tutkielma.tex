@@ -81,10 +81,10 @@ mikäli ohjelma käyttää lukkotiedostoa es\-tä\-mään useamman ohjelmainstan
 Hallitsematon sulkeutuminen voi myös aiheuttaa tiedon korruptoitumista jos ohjelma kaatuu esimerkiksi kesken levykirjoitusta.
 
 Muistivirheiksi luokitellaan tyypillisesti muun muassa
-taulukon yli tai ali indeksointi, puskurin ylivuoto sekä alustamattoman muistin käyttö:
+taulukon yli- tai ali- indeksointi, puskurin ylivuoto sekä alustamattoman muistin käyttö:
 
 \begin{itemize}
-    \item Taulukon yli tai ali indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
+    \item Taulukon yli- tai ali- indeksointi: C-kielen taulukoissa ohjelmoijan vastuulla on huolehtia,
           ettei taulukkoa indeksoida liian suurella tai negatiivisella indeksillä.
           Jos näin pääsee tapahtumaan, kielen spesifikaatio ei ota kantaa siihen mitä tapahtuu~\cite[\S 6.5.6]{CSpec}.
 % An array subscript is out of range, even if an object is apparently accessible with the
@@ -173,7 +173,7 @@ Ohjelmistotekniikan menetelmistä tuttu laadunvarmistustekniikka on automaattise
 Testausta voidaan soveltaa myös tietoturvaongelmien välttämiseen tietyin edellytyksin:
 sen sijaan, että testataan toivotun toiminnallisuuden olemassaoloa,
 testataankin \emph{epätoivotun käytöksen} puutetta~\cite{OuluBrowser}.
-Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi ikisilmukat).
+Yleisempiä epätoivottuja tapahtumia ovat kaatumiset ja jumiutumiset (esimerkiksi päättymättömät silmukat).
 
 % \subsection{Luokittelu}
 
@@ -182,7 +182,7 @@ Testauskeinoja voidaan tavallisten funktionaalisten testien tapaan luokitella ka
 testaaminen kohdistuu ohjelmiston tavanomaisiin rajapintoihin ja kuinka paljon
 ohjelmiston sisäisen rakenteen toimintaan~\cite{OuluBrowser}.
 
-Blackbox-testauksessa ohjelmatiedostoa ajetaan aivan normaalisti,
+Blackbox-testauksessa ohjelmatiedostoa suoritetaan aivan normaalisti,
 ja tutkitaan sen käyttäytymistä ohjelmaan sopivilla syötteillä~\cite{OuluBrowser}.
 Esimerkiksi palvelinohjelmiston ollessa kyseessä siihen avataan verkkoyhteys,
 tai komentoriviohjelmalle annetaan syöte normaalisti komentoriviparametrien kautta.
@@ -197,8 +197,6 @@ aloittaen lähdekoodin staattisesta analyysista.
 \section{Lähdekoodin staattinen analyysi}
 \label{StaattinenAnalyysi}
 
-\subsection{Yleisesti}
-
 Staattinen analyysi on whitebox-menetelmä jossa yritetään paikantaa ohjelman
 lähdekoodista tyypillisiä ohjelmointivirheitä~\cite[22.3]{Sommerville}.
 Monista täl\-lai\-sis\-ta ongelmista saattaa olla seuraamuksia tietoturvan kannalta~\cite{StaticCodeAnalysis}.
@@ -206,8 +204,6 @@ Yleisin tällainen keino on kääntäjien tarjoamat varoitukset ohjelmiston kä�
 Usein käytettyjä staattisen analyysin työkaluja ohjelmointivirheiden etsintään
 ovat \emph{lint}-tyyliset~\cite{Lint} ohjelmistot eri ohjelmointikielille sekä
 esimerkiksi Coverity~\cite{Coverity}.
-
-\subsection{Lint}
 
 Lint~\cite{Lint} on varhainen C-kielisiä ohjelmia tarkistava staattisen analyysin työkalu vuodelta 1978.
 Lintin fokuksena eivät olleet varsinaisesti tietoturvaongelmat,
@@ -273,12 +269,10 @@ Tätä varten on kehitelty \emph{ohjelman ajonaikaiseen instrumentointiin} tai \
 jolla käännettyyn ohjelmatiedostoon voidaan ajonaikana lisätä ylimääräisiä tarkistuksia.
 Eräs tällainen työkalu on laajasti käytetty Valgrind.
 
-\subsection{Valgrind}
-
 Valgrind on Unix-pohjaisissa käyttöjärjestelmissä toimiva ohjelmien dynaamiseen instrumentointiin
 perustuva työkalu, jota käytetään useimmiten muistivirheiden etsintään~\cite{Valgrind}.
 Valgrind itsessään on laajempi kehys dynaamiseen instrumentointiin,
-josta muistivirheitä löytävä \emph{Memcheck}-työkalu on ylivoimaisesti käytetyin.
+josta muistivirheitä löytävä \emph{Memcheck}-työkalu on Valgrindissa oletuksena käytössä.
 Mikä tahansa käännetty ohjelma voidaan ajaa Valgrindin Memcheckin instrumentoimana ajamalla
 \texttt{valgrind \emph{ohjelma}}.
 
@@ -290,7 +284,7 @@ jonka jälkeen muunnettu vä\-li\-kie\-li\-nen ohjelma JIT-käännetään natiiv
 Memcheck-työkalun instrumentointiin liittyy kaksi osa-aluetta:
 sekä alustamattoman muistin että varaamattomien muistialueiden käytön seuranta.
 
-Jälkimmäistä varten Memcheck varaa jokaista osoiteavaruuden tavua varten yhden ylimääräisen bitin muistia.
+Varaamattomien muistialueiden käytön seurantaa  varten Memcheck varaa jokaista osoiteavaruuden tavua varten yhden ylimääräisen bitin muistia.
 Tämä nk. A-bitti (accessible) kertoo onko kyseinen tavu laillisesti ohjelman käytettävissä.
 Lisäksi Memcheck instrumentoi ohjelman jokaisen muistiin viittaavan konekäskyn
 ensiksi tarkistamaan muistiosoitetta vastaavan A-bitin arvon.
@@ -299,7 +293,8 @@ yritti ohjelma viitata kiellettyyn muistiosoitteeseen ja
 Memcheck tulostaa virheilmoituksen.
 Memcheckin täytyy vielä sisäisesti pitää kirjaa ohjelman varaamista muistialueista,
 joten se kaappaa kaikki kutsut sekä käyttöjärjestelmän että C-kirjaston muistinhallintafunktioihin,
-ja korvaa ne omalla toteutuksellaan joka päivittää A-bittejä muistia varatessa tai sitä vapautettaessa.
+ja korvaa ne omalla toteutuksellaan,
+joka päivittää A-bittejä muistia varatessa tai sitä vapautettaessa.
 
 Alustamattoman muistin käytön seuranta on Memcheckille haastavampi operaatio.
 Voisi helposti kuvitella,
@@ -451,13 +446,13 @@ tämä kuitenkin riitti kaatamaan useat Unix-ohjelmat.
 Testattavalle ohjelmalle annettu syöte voi ohjelmasta riippuen olla
 hyvinkin erityyppistä kuin edellä esitelty tavujonoista koostuva syöte.
 Esimerkiksi graafisen käyttöliittymän toteutus toimii usein tapahtumapohjaisesti:
-sekä Unixin X11:n, Mac OS X:n Aquan sekä Microsoft Windowsin ikkunanhallinta on toteutettu näin.
+sekä Mac OS X:n Aquan että Microsoft Windowsin ikkunanhallinta on toteutettu näin.
 Näihin graafisiin järjestelmiin perustuvia ohjelmia voi siten fuzzata lähettämällä
 niille esimerkiksi tekaistuja näppäimistön painalluksia tai hiiren liikkeitä vastaavia
-sanomia~\cite{X11Fuzz,MacOsFuzz,WinNtFuzz}.
+sanomia~\cite{MacOsFuzz,WinNtFuzz}.
 
 Esimerkki rakenteellisen syötteen generoinnista on \emph{regfuzz}-ohjelma,
-joka on kehitelty säännöllisiä lausekkeiden (regular expression) kirjastojen
+joka on kehitelty säännöllisten lausekkeiden (regular expression) kirjastojen
 fuzzaamiseen~\cite{RegFuzz}.
 Regfuzz lähtee rakentamaan säännöllistä lauseketta pala kerrallaan sisältä ulospäin:
 liikkeelle lähdetään tyhjästä merkkijonosta ja siihen lisätään joko täysin
@@ -489,6 +484,6 @@ eivät ne ole toisiaan poissulkevia vaan toisiaan täydentäviä:
     \item Dynaamiseen instrumentointiin sekä staattiseen analyysiin soveltuvat hyvin valmiina saatavilla olevat työkalut.
           Fuzzausta varten voi joutua toteuttamaan itse toivotunlaista syötettä generoivan fuzzerin.
     \item Yksinkertainen fuzz-testi yrittää löytää syötteitä, jotka vain kaatavat testattavan ohjelman.
-          Yhdistämällä fuzzaukseen dynaamisen instrumentoinnin menetelmiä voidaan tiukentaa
+          Yhdistämällä fuzzaukseen dynaamisen instrumentoinnin menetelmiä voidaan
           tiukentaa fuzzauksen kriteereitä ja etsiä myös muistivirheitä aiheuttavia syötteitä.
 \end{itemize}
